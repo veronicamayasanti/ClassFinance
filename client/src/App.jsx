@@ -1,14 +1,27 @@
-import { useState } from 'react'
 import './App.css'
+import React, { useState, useEffect } from 'react';
+import UserList from './component/UserList';
+import AddUserForm from './component/AddUserForm';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [users, setUsers] = useState([]);
+
+  const handleUserAdded = (newUser) => {
+    setUsers([...users, newUser]);
+  };
+
+  useEffect(() => {
+    fetch('http://localhost:3000/api/users')
+      .then((response) => response.json())
+      .then((data) => setUsers(data));
+  }, []);
 
   return (
-    <div>
-     <h1>hello</h1>
+    <div className="App">
+       <AddUserForm onUserAdded={handleUserAdded} />
+       <UserList users={users} />
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
