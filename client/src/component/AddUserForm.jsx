@@ -21,14 +21,15 @@ function AddUserForm({ onUserAdded }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="flex items-center space-x-6 bg-blue-100 p-4 rounded shadow">
       <input
         type="text"
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="Enter name"
+        className="border border-gray-300 p-2 rounded flex-grow"
       />
-      <button type="submit">Add User</button>
+      <button type="submit" className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Add User</button>
     </form>
   );
 }
