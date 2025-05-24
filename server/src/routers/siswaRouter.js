@@ -1,13 +1,14 @@
 import express from "express";
-import { getAllUsers,
-    createUser,
+import {
+    registerSiswa,
+    loginSiswa,
     updateUser,
     deleteUser
-} from "../controllers/userController.js";
-
+} from "../controllers/siswaController.js";
 const userRouter = express.Router()
-userRouter.get('/users', getAllUsers);
-userRouter.post('/users', createUser)
+
+userRouter.post('/register', registerSiswa)
+userRouter.post('/login', loginSiswa)
 userRouter.put('/users/:id', updateUser)
 userRouter.delete('/users/:id', deleteUser)
 
