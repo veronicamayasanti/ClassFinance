@@ -17,6 +17,7 @@ function HalamanSiswa() {
 
   const handleLogout = () => {
     localStorage.removeItem('username'); // Hapus username dari localStorage
+    localStorage.removeItem('id');
     navigate('/'); // Arahkan kembali ke halaman home
   };
 

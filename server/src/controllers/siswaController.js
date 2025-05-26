@@ -36,9 +36,27 @@ export const loginSiswa = (req, res) => {
         if (!validPassword) {
             return res.status(401).json({err: "Invalid credentials" });
         }
-        res.json({message: `Login Successful, welcome ${username}`, data_siswaId: data_siswa.id})
+        res.json(results[0])
     })
 }
+
+// Mendapatkan data siswa berdasarkan ID
+export const getUserById = (req, res) => {
+    const { id } = req.params;
+    const sql = 'SELECT * FROM data_siswa WHERE id = ?';
+
+    db.query(sql, [id], (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (results.length === 0) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const { password, ...userWithoutPassword } = results[0]; // Menghapus password
+        res.json(userWithoutPassword);
+    });
+};
+
 
 // update data siswa
 export const updateUser = (req, res) => {

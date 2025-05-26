@@ -22,10 +22,11 @@ function LoginSiswa() {
 
       if (response.ok) {
         const result = await response.json();
-        console.log(result.message); // Bisa diganti dengan handler untuk menampilkan pesan sukses
         setUsername('');
         setPassword('');
         localStorage.setItem('username', username);
+        localStorage.setItem('id', result.id );
+
         navigate('/halamansiswa'); // Mengarahkan ke halaman siswa
       } else {
         throw new Error('Login failed');
