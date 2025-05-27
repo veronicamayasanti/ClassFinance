@@ -70,7 +70,9 @@ export const updateUser = (req, res) => {
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "id not found"});
         }
-        res.json({message: "data siswa update successfully"})
+        const updatedData = { id, nama_siswa, no_hp, username }; // Data yang dibutuhkan untuk dikembalikan
+        res.json(updatedData); // Mengembalikan data siswa yang baru diperbarui
+
     })
 }
 
