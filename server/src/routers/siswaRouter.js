@@ -1,6 +1,6 @@
 import express from "express";
 import {
-    registerSiswa,
+    registerUser,
     loginSiswa,
     getUserById,
     updateUser,
@@ -8,7 +8,7 @@ import {
 } from "../controllers/siswaController.js";
 const userRouter = express.Router()
 
-userRouter.post('/register', registerSiswa)
+userRouter.post('/register', registerUser)
 userRouter.post('/login', loginSiswa)
 userRouter.get('/users/:id', getUserById)
 userRouter.put('/users/:id', updateUser)
