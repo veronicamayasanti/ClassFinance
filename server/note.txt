@@ -1,2 +1,9 @@
+ user
  "username" : "samantha",
  "password" : "akutata"
+
+ operator
+ "name" : "maya",
+     "grade" : "1b",
+     "username" : "korlas1b",
+     "password" : "korlas1b"

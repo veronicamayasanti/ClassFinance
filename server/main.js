@@ -1,7 +1,8 @@
 import express from "express"
+import cors from "cors"
+
 import userRouter from "./src/routers/siswaRouter.js";
 import operatorRouter from "./src/routers/operartorRouter.js";
-import cors from "cors"
 
 const app = express()
 app.use(cors())

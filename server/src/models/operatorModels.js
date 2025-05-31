@@ -1,10 +1,10 @@
 import db from '../database.js'
 
-// membuat akun operator
-export const createOperatorModel = (name, password) => {
+// register operator
+export const createOperatorModel = (name, grade, username, password) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO operator (name, password) VALUES (?, ?)';
-        db.query(sql, [name, password], (err, result) => {
+        const sql = 'INSERT INTO korlas_db (name, grade, username, password) VALUES (?, ?, ?, ?)';
+        db.query(sql, [name, grade, username, password], (err, result) => {
             if (err) {
                 return reject(err);
             }
@@ -13,3 +13,15 @@ export const createOperatorModel = (name, password) => {
     })
 };
 
+// login operator
+export const loginOperatorModel = (username) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM korlas_db WHERE username = ?';
+        db.query(sql, [username], (err, results) => {
+            if(err){
+                return reject(err)
+            }
+            resolve(results)
+        })
+    })
+}
