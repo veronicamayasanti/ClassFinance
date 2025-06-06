@@ -1,9 +1,9 @@
 import './App.css'
 import React from 'react';
-import PagesSiswa from './pages/PagesSiswa';
+import Pages from './pages/Pages.jsx';
 
 function App() {
-  return <PagesSiswa />;
+  return <Pages />;
 }
 
 export default App;

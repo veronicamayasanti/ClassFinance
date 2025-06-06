@@ -6,8 +6,10 @@ import RegisterSiswa from '../component/users/RegisterSiswa';
 import HalamanSiswa from '../component/users/HalamanSiswa';
 import Home from "./Home.jsx";
 import ProfileSiswa from "../component/users/ProfileSiswa.jsx";
+import LoginOperator from "../component/operator/LoginOperator.jsx";
+import OperatorDashboard from "../component/operator/OperatorDashboard.jsx";
 
-function PagesSiswa() {
+function Pages() {
   return (
     <Router>
       <Layout>
@@ -17,10 +19,12 @@ function PagesSiswa() {
           <Route path="/halamansiswa" element={<HalamanSiswa />} />
           <Route path="/halamansiswa/profile" element={<ProfileSiswa />} />
           <Route path="/" element={<Home />} />
+          <Route path="/loginkorlas" element={<LoginOperator />} />
+          <Route path="/dashboard" element={<OperatorDashboard />} />
         </Routes>
       </Layout>
     </Router>
   );
 }
 
-export default PagesSiswa;
+export default Pages;
