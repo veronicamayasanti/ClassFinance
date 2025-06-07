@@ -1,10 +1,12 @@
 import db from '../database.js'
 
 // register operator
-export const createOperatorModel = (name, grade, username, password) => {
+export const createOperatorModel = (name, email, phone_number, username, password) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO korlas_db (name, grade, username, password) VALUES (?, ?, ?, ?)';
-        db.query(sql, [name, grade, username, password], (err, result) => {
+        const sql = 'INSERT INTO tb_users (name, email, phone_number, username, password) VALUES (?, ?, ?, ?, ?)';
+        console.log(email)
+        db.query(sql, [name, email, phone_number, username, password], (err, result) => {
+            console.log(email)
             if (err) {
                 return reject(err);
             }

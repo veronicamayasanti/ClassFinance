@@ -7,3 +7,7 @@
      "grade" : "1b",
      "username" : "korlas1b",
      "password" : "korlas1b"
+
+ admin:
+  "username": "admin",
+     "password" : "admin"
