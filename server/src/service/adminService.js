@@ -3,8 +3,8 @@ import {
 } from "../models/adminModels.js";
 import bcrypt from "bcrypt";
 
-export const loginAdminService = async (username, password) => {
-    const results = await loginAdminModel(username);
+export const loginAdminService = async (email, password) => {
+    const results = await loginAdminModel(email);
     if (results.length === 0) throw new Error('Invalid credentials')
 
     const admin = results[0]

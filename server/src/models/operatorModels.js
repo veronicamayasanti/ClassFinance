@@ -1,12 +1,12 @@
 import db from '../database.js'
 
 // register operator
-export const createOperatorModel = (name, email, phone_number, username, password) => {
+export const createOperatorModel = (name, email, phone_number, password) => {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO tb_users (name, email, phone_number, username, password) VALUES (?, ?, ?, ?, ?)';
-        console.log(email)
-        db.query(sql, [name, email, phone_number, username, password], (err, result) => {
-            console.log(email)
+        const sql = 'INSERT INTO tb_users (name, email, phone_number, password) VALUES (?, ?, ?, ?, ?)';
+
+        db.query(sql, [name, email, phone_number, password], (err, result) => {
+
             if (err) {
                 return reject(err);
             }

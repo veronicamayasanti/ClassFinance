@@ -4,7 +4,7 @@ import {
 
 export const loginAdminController = async (req, res) => {
     try{
-        const admin = await loginAdminService(req.body.username, req.body.password);
+        const admin = await loginAdminService(req.body.email, req.body.password);
         const {password, ...admminWithoutPassword} = admin;
         res.json(admminWithoutPassword)
     }catch (error){

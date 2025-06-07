@@ -6,9 +6,9 @@ import bcrypt from "bcrypt";
 
 
 export const createOperatorService = async (operatorData) => {
-    const {name, email, phone_number, username, password} = operatorData;
+    const {name, email, phone_number, password} = operatorData;
     const hashedPassword = await bcrypt.hash(password, 10);
-    return await createOperatorModel(name, email, phone_number, username, hashedPassword)
+    return await createOperatorModel(name, email, phone_number, hashedPassword)
 };
 
 export const loginOperatorService = async (username, password) => {

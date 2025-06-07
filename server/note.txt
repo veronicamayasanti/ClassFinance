@@ -9,5 +9,5 @@
      "password" : "korlas1b"
 
  admin:
-  "username": "admin",
+  "email": "veronica@gmail.com",
      "password" : "admin"
