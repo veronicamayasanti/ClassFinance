@@ -1,7 +1,7 @@
 import {
     createOperatorService,
     loginOperatorService
-} from "../service/operatorService.js";
+} from "../services/operatorService.js";
 
 export const createOperatorController = async (req, res) => {
     try{

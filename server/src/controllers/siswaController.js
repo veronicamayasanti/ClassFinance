@@ -4,7 +4,7 @@ import {
     fetchUserById as fetchUserByIdService,
     modifyUser as updateUserService,
     removeUser as deleteUserService
-} from "../service/UserService.js";
+} from "../services/UserService.js";
 
 // register siswa
 export const registerUser = async (req, res) => {

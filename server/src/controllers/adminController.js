@@ -1,6 +1,6 @@
 import {
     loginAdminService
-} from "../service/adminService.js";
+} from "../services/adminService.js";
 
 export const loginAdminController = async (req, res) => {
     try{
