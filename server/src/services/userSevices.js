@@ -37,12 +37,28 @@ export const loginUserService = async (email, password) => {
     return admin;
 }
 
-// get all user
-export const getAllUserService = async () => {
+// Get all user with pagination
+export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') => {
     try {
-        const users = await getAllUserModel();
-        return users
-    }catch (error){
-        throw new Error('Error in getalluserservice: '+ error.message);
+        return await getAllUserModel(offset, limit, searchTerm); // Call updated model with offset and limit
+    } catch (error) {
+        throw new Error('Error in getAllUserService: ' + error.message);
+    }
+}
+
+// Get total user count for pagination
+export const getTotalUserCount = async () => {
+    try {
+        const sql = 'SELECT COUNT(*) AS count FROM tb_users'; // SQL to count total users
+        return new Promise((resolve, reject) => {
+            db.query(sql, (error, results) => {
+                if (error) {
+                    return reject(error);
+                }
+                resolve(results[0].count);
+            });
+        });
+    } catch (error) {
+        throw new Error('Error in getTotalUserCount: ' + error.message);
     }
 }

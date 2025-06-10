@@ -2,8 +2,10 @@ import {
     checkEmailExists,
     registerUserservice,
     loginUserService,
-    getAllUserService
+    getAllUserService,
+    getTotalUserCount
 } from "../services/userSevices.js";
+
 
 
 // register user
@@ -36,11 +38,28 @@ export const loginUserController = async (req, res) => {
 
 // get all user
 export const getAllUserController = async (req, res) => {
-    try{
-        const users = await getAllUserService();
+    const limit = req.query.limit ? parseInt(req.query.limit) : 2; // Set default to 2
+    const page = req.query.page ? parseInt(req.query.page) : 1; // Default to 1 if not provided
+    const searchTerm = req.query.search || ''; // Get search term
+    const offset = (page - 1) * limit;
+
+    try {
+        const [users, totalCount] = await Promise.all([
+            getAllUserService(offset, limit, searchTerm), // Fetch only limited users now
+            getTotalUserCount() // Fetch total count of users
+        ]);
+
         const usersWithoutPassword = users.map(({ password, ...rest }) => rest);
-        res.json(usersWithoutPassword);
-    }catch (error){
-        res.status(500).json('error in getallusercontroller' + error.message)
+        const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
+
+        res.json({
+            page,
+            totalPages,
+            limit,
+            users: usersWithoutPassword,
+        });
+
+    } catch (error) {
+        res.status(500).json({ error: 'error in getAllUserController', message: error.message });
     }
 }

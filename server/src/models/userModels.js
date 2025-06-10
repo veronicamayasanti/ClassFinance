@@ -28,14 +28,14 @@ export const loginUserModel = (email) =>     {return new Promise ((resolve, reje
 }
 
 // get all user
-export const getAllUserModel = () => {
+export const getAllUserModel = (offset = 0, limit = 10, searchTerm = '') => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM tb_users WHERE role_id != 1';
-        db.query(sql, (error, results) => {
-            if (error){
-                return reject(error, error.message = "error in model")
+        const sql = 'SELECT * FROM tb_users WHERE role_id != 1 AND name LIKE ? LIMIT ?, ?'; // SQL with pagination
+        db.query(sql, [`%${searchTerm}%`, offset, limit], (error, results) => {
+            if (error) {
+                return reject(error, error.message = "error in model");
             }
-            resolve(results)
-        })
-    })
+            resolve(results);
+        });
+    });
 }
