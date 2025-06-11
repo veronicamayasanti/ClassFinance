@@ -3,7 +3,9 @@ import {
     registerUserservice,
     loginUserService,
     getAllUserService,
-    getTotalUserCount
+    getTotalUserCount,
+    updateUserService,
+    deleteUserService
 } from "../services/userSevices.js";
 
 
@@ -61,5 +63,39 @@ export const getAllUserController = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: 'error in getAllUserController', message: error.message });
+    }
+}
+
+// Update user
+export const updateUserController = async (req, res) => {
+    const userId = req.params.id; // Get user ID from URL parameters
+    const { name, phone_number, email, grade_id } = req.body;  // Get updated user data from request body
+    try {
+        // Log the data received to ensure it is valid
+        console.log("Data received for update:", req.body);
+
+        // Check if the new email already exists for a different user
+        const emailExists = await checkEmailExists(email);
+        if (emailExists) {
+            return res.status(400).json({ error: "Email already exists for another user." });
+        }
+
+        const updatedUser = await updateUserService(userId, name, phone_number, email, grade_id); // Call service to update user
+        res.json({ message: 'User updated successfully', user: updatedUser });
+    } catch (error) {
+        console.error("Update Error:", error);
+        res.status(500).json({ error: 'error in updateUserController', message: error.message });
+    }
+}
+
+// Delete user
+export const deleteUserController = async (req, res) => {
+    const userId = req.params.id; // Get user ID from URL parameters
+
+    try {
+        await deleteUserService(userId); // Call service to delete user
+        res.json({ message: 'User deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'error in deleteUserController', message: error.message });
     }
 }

@@ -39,3 +39,49 @@ export const getAllUserModel = (offset = 0, limit = 10, searchTerm = '') => {
         });
     });
 }
+
+// Get user by ID
+export const getUserByIdModel = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM tb_users WHERE id = ? AND role_id != 1';
+        db.query(sql, [id], (error, result) => {
+            if (error) {
+                console.error("DB query error:", error);
+                return reject(error);
+            }
+            // Pastikan kita mendapat satu pengguna
+            if (result.length === 0) {
+                return reject(new Error("User not found"));
+            }
+            resolve(result[0]); // Mengembalikan user pertama
+        });
+    });
+}
+
+
+// update data user
+export const updateUserModel = (id, name, phone_number, email, grade_id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE tb_users SET name = ?, phone_number = ?, email = ?, grade_id = ? WHERE id = ?';
+        db.query(sql, [name, phone_number, email,  grade_id, id], (error, result) => {
+            if (error) {
+                console.error("DB query error:", error);
+                return reject(error, error.message = "error update in model");
+            }
+            resolve(result);
+        });
+    });
+}
+
+// Delete user
+export const deleteUserModel = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM tb_users WHERE id = ? AND role_id != 1';
+        db.query(sql, [id], (error, result) => {
+            if (error) {
+                return reject(error, error.message = "error in model");
+            }
+            resolve(result);
+        });
+    });
+}

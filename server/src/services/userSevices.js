@@ -1,7 +1,9 @@
 import {
     registerUserModel,
     loginUserModel,
-    getAllUserModel
+    getAllUserModel,
+    updateUserModel,
+    deleteUserModel
 } from "../models/userModels.js";
 import bcrypt from "bcrypt";
 import db from '../database.js'
@@ -62,3 +64,22 @@ export const getTotalUserCount = async () => {
         throw new Error('Error in getTotalUserCount: ' + error.message);
     }
 }
+
+// Update user
+export const updateUserService = async (id, name, phone_number, email, grade_id) => {
+    try {
+        return await updateUserModel(id, name, phone_number, email, grade_id ); // Call model to update user
+    } catch (error) {
+        throw new Error('Error in updateUserService: ' + error.message);
+    }
+}
+
+// Delete user
+export const deleteUserService = async (id) => {
+    try {
+        return await deleteUserModel(id); // Call model to delete user
+    } catch (error) {
+        throw new Error('Error in deleteUserService: ' + error.message);
+    }
+}
+
