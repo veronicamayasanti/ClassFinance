@@ -2,6 +2,7 @@ import {
     registerUserModel,
     loginUserModel,
     getAllUserModel,
+    getUserByIdModel,
     updateUserModel,
     deleteUserModel
 } from "../models/userModels.js";
@@ -37,6 +38,16 @@ export const loginUserService = async (email, password) => {
     const validPassword = await bcrypt.compare(password, admin.password);
     if (!validPassword) throw new Error('Invalid credentials');
     return admin;
+}
+
+// Get user by ID
+export const getUserByIdService = async (id) => {
+    try {
+        const user = await getUserByIdModel(id); // Call model to get user by ID
+        return user;
+    } catch (error) {
+        throw new Error('Error in getUserByIdService: ' + error.message);
+    }
 }
 
 // Get all user with pagination

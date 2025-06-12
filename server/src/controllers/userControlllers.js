@@ -3,6 +3,7 @@ import {
     registerUserservice,
     loginUserService,
     getAllUserService,
+    getUserByIdService,
     getTotalUserCount,
     updateUserService,
     deleteUserService
@@ -63,6 +64,20 @@ export const getAllUserController = async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: 'error in getAllUserController', message: error.message });
+    }
+}
+
+// Get user by ID
+export const getUserByIdController = async (req, res) => {
+    const userId = req.params.id; // Ambil ID dari parameter URL
+
+    try {
+        const user = await getUserByIdService(userId); // Panggil service untuk mendapatkan pengguna
+        const {password, ...userByIdWithoutPassword} = user;
+        res.json(userByIdWithoutPassword);
+    } catch (error) {
+        console.error("Error fetching user:", error);
+        res.status(404).json({ error: error.message });
     }
 }
 
