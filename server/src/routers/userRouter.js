@@ -4,6 +4,8 @@ import {
     loginUserController,
     getAllUserController,
     getUserByIdController,
+    getUsersByRoleController,
+    getUsersByGradeController,
     updateUserController,
     deleteUserController
 } from "../controllers/userControlllers.js";
@@ -13,6 +15,8 @@ userRouter.post('/user/register', registerUserController)
 userRouter.post('/user/login', loginUserController)
 userRouter.get('/user', getAllUserController)
 userRouter.get('/user/:id', getUserByIdController);
+userRouter.get('/user/role/:roleId', getUsersByRoleController);
+userRouter.get('/user/grade/:gradeId', getUsersByGradeController);
 userRouter.put('/user/:id', updateUserController);
 userRouter.delete('/user/:id', deleteUserController);
 

@@ -4,6 +4,8 @@ import {
     loginUserService,
     getAllUserService,
     getUserByIdService,
+    getUsersByRoleService,
+    getUsersByGradeService,
     getTotalUserCount,
     updateUserService,
     deleteUserService
@@ -78,6 +80,38 @@ export const getUserByIdController = async (req, res) => {
     } catch (error) {
         console.error("Error fetching user:", error);
         res.status(404).json({ error: error.message });
+    }
+}
+
+// Get users by role_id
+export const getUsersByRoleController = async (req, res) => {
+    const roleId = req.params.roleId; // Ambil roleId dari parameter URL
+
+    try {
+        const users = await getUsersByRoleService(roleId); // Panggil service untuk mendapatkan pengguna
+        // Sembunyikan password dari hasil
+        const usersWithoutPassword = users.map(({ password, ...rest }) => rest); // Menggunakan destructuring untuk menghapus password
+
+        res.json(usersWithoutPassword); // Kirim kembali data pengguna tanpa password
+    } catch (error) {
+        console.error("Error fetching users by role:", error);
+        res.status(500).json({ error: error.message });
+    }
+}
+
+// Get users by grade_id
+export const getUsersByGradeController = async (req, res) => {
+    const gradeId = req.params.gradeId; // Ambil roleId dari parameter URL
+
+    try {
+        const users = await getUsersByGradeService(gradeId); // Panggil service untuk mendapatkan pengguna
+        // Sembunyikan password dari hasil
+        const usersWithoutPassword = users.map(({ password, ...rest }) => rest); // Menggunakan destructuring untuk menghapus password
+
+        res.json(usersWithoutPassword); // Kirim kembali data pengguna tanpa password
+    } catch (error) {
+        console.error("Error fetching users by role:", error);
+        res.status(500).json({ error: error.message });
     }
 }
 

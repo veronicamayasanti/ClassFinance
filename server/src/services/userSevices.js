@@ -3,6 +3,8 @@ import {
     loginUserModel,
     getAllUserModel,
     getUserByIdModel,
+    getUsersByRoleModel,
+    getUsersByGradeModel,
     updateUserModel,
     deleteUserModel
 } from "../models/userModels.js";
@@ -47,6 +49,24 @@ export const getUserByIdService = async (id) => {
         return user;
     } catch (error) {
         throw new Error('Error in getUserByIdService: ' + error.message);
+    }
+}
+
+// Get users by role_id
+export const getUsersByRoleService = async (roleId) => {
+    try {
+        return await getUsersByRoleModel(roleId); // Panggil model untuk mendapatkan pengguna
+    } catch (error) {
+        throw new Error('Error in getUsersByRoleService: ' + error.message);
+    }
+}
+
+// Get users by grade_id
+export const getUsersByGradeService = async (gradeId) => {
+    try {
+        return await getUsersByGradeModel(gradeId); // Panggil model untuk mendapatkan pengguna
+    } catch (error) {
+        throw new Error('Error in getUsersByRoleService: ' + error.message);
     }
 }
 
