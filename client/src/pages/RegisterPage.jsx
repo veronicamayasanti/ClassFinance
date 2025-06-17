@@ -31,6 +31,13 @@ const RegisterPage = () => {
                 setSuccessMessage('Registration successful!');
                 setError(null);
 
+                // Setel semua state kembali ke nilai kosong setelah pendaftaran berhasil
+                setName('');
+                setPhoneNumber('');
+                setEmail('');
+                setPassword('');
+                setGradeId(1); // Setel kembali ke nilai default
+
                 navigate('/login')
             }
         } catch (err) {
@@ -41,9 +48,9 @@ const RegisterPage = () => {
         }
     };
     return (
-        <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+        <div className="flex min-h-full flex-1 flex-col justify-center px-1 py-1 lg:px-8 ">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <h2 className="mt-10 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+                <h2 className="mt-2 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
                     Register Account
                 </h2>
             </div>
@@ -52,14 +59,14 @@ const RegisterPage = () => {
                     {successMessage && <p className="success">{successMessage}</p>}
                 </p>
 
-            <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+            <div className="mt-1 sm:mx-auto sm:w-full sm:max-w-sm ">
                 <form onSubmit={handleSubmit} className="space-y-6">
 
                     <div>
-                        <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900">
+                        <label htmlFor="name" className="block text-sm/6 font-medium text-gray-900 ">
                             Your Name
                         </label>
-                        <div className="mt-2">
+                        <div className="mt-1">
                             <input
                                 type="text"
                                 value={name}
@@ -107,11 +114,6 @@ const RegisterPage = () => {
                             <label htmlFor="password" className="block text-sm/6 font-medium text-gray-900">
                                 Password
                             </label>
-                            <div className="text-sm">
-                                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                                    Forgot password?
-                                </a>
-                            </div>
                         </div>
                         <div className="mt-2">
                             <input

@@ -23,6 +23,12 @@ const RegisterPage = () => {
                 setError(response.error);
                 setSuccessMessage(null);
             } else {
+                // Menyimpan data pengguna di localStorage
+                const { name, role_id, grade_id } = response; 
+                localStorage.setItem('userName', name);
+                localStorage.setItem('userRoleId', role_id);
+                localStorage.setItem('userGradeId', grade_id);
+
                 // Menetapkan success message jika pendaftaran berhasil
                 setSuccessMessage('Login successful!');
                 setError(null);
