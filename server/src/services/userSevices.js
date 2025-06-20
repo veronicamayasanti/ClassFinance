@@ -82,7 +82,7 @@ export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') 
 // Get total user count for pagination
 export const getTotalUserCount = async () => {
     try {
-        const sql = 'SELECT COUNT(*) AS count FROM tb_users'; // SQL to count total users
+        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1'; // SQL to count total users
         return new Promise((resolve, reject) => {
             db.query(sql, (error, results) => {
                 if (error) {

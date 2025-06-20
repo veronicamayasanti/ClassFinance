@@ -1,34 +1,31 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Mengimpor useNavigate untuk navigasi
+import { useNavigate } from 'react-router-dom';
 import { getAllUsers } from '../api';
 
 
 const DashboardPage = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
-    const [currentPage, setCurrentPage] = useState(1); // State untuk halaman saat ini
-    const [totalPages, setTotalPages] = useState(0); // Total halaman
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(0);
     const [showUsers, setShowUsers] = useState(false);
     const navigate = useNavigate();
 
-    // Ambil nama dari localStorage
     const userName = localStorage.getItem('userName') || 'User'; // Default to 'User' if name is not found
 
-    // Fungsi untuk menangani logout
     const handleLogout = () => {
-        // Bersihkan localStorage
         localStorage.removeItem('userName');
         localStorage.removeItem('userRoleId');
         localStorage.removeItem('userGradeId');
-
-        // Arahkan pengguna ke halaman login setelah logout
         navigate('/login');
     };
 
-    const fetchUsers = async () => {
+    const fetchUsers = async (page) => {
         try {
-            const result = await getAllUsers(); // Mendapatkan semua pengguna
-            setUsers(result.users); // Ambil pengguna dari result.users
+            const result = await getAllUsers(page);
+            console.log(result)
+            setUsers(result.users);
+            setTotalPages(result.totalPages);
         } catch (err) {
             setError(err.message);
             console.error("Error fetching users:", err);
@@ -36,16 +33,21 @@ const DashboardPage = () => {
     };
 
     const handleShowUsers = () => {
-        fetchUsers(); // Panggil function untuk mengambil data
+        fetchUsers(currentPage); // Panggil function untuk mengambil data
         setShowUsers(true); // Set state untuk menunjukkan tabel
     };
 
     useEffect(() => {
-        // Fetch users hanya jika tombol ditekan
         if (showUsers) {
-            fetchUsers();
+            fetchUsers(currentPage);
         }
-    }, [showUsers]);
+    }, [currentPage, showUsers]);
+
+    const changePage = (page) => {
+        if (page < 1 || page > totalPages) return;
+        setCurrentPage(page);
+        fetchUsers(page);
+    };
 
     return (
         <div className="flex min-h-screen">
@@ -57,7 +59,7 @@ const DashboardPage = () => {
                             Logout
                         </button>
                     </li>
-                    {/* Tombol untuk menampilkan semua data pengguna */}
+
                     <li>
                         <button onClick={handleShowUsers} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
                             Tampilkan Semua Pengguna
@@ -65,35 +67,58 @@ const DashboardPage = () => {
                     </li>
                 </ul>
             </div>
+
             <div className="flex-1 p-10 bg-gray-100">
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang, {userName}!</h1>
-                <p>Ini adalah halaman dashboard. Anda telah login dengan sukses.</p>
 
-                {/* Tampilkan tabel pengguna jika showUsers true */}
                 {showUsers && (
                     <div className="mt-5">
                         {error && <p className="text-red-500">{error}</p>}
                         {users.length > 0 ? (
-                            <table className="min-w-full border border-gray-300">
-                                <thead>
-                                <tr>
-                                    <th className="border-b p-2 text-left">Nama</th>
-                                    <th className="border-b p-2 text-left">Nomor Telepon</th>
-                                    <th className="border-b p-2 text-left">Email</th>
-                                    <th className="border-b p-2 text-left">Grade ID</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {users.map((user) => (
-                                    <tr key={user.id}>
-                                        <td className="border-b p-2">{user.name}</td>
-                                        <td className="border-b p-2">{user.phone_number}</td>
-                                        <td className="border-b p-2">{user.email}</td>
-                                        <td className="border-b p-2">{user.grade_id}</td>
+                            <div>
+                                <h4 className="text-3xl font-semibold mb-4"> semua user </h4>
+                                <table className="min-w-full border border-gray-300">
+                                    <thead>
+                                    <tr>
+                                        <th className="border-b p-2 text-left">Nama</th>
+                                        <th className="border-b p-2 text-left">Nomor Telepon</th>
+                                        <th className="border-b p-2 text-left">Email</th>
+                                        <th className="border-b p-2 text-left">Grade ID</th>
                                     </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    {users.map((user) => (
+                                        <tr key={user.id}>
+                                            <td className="border-b p-2">{user.name}</td>
+                                            <td className="border-b p-2">{user.phone_number}</td>
+                                            <td className="border-b p-2">{user.email}</td>
+                                            <td className="border-b p-2">{user.grade_id}</td>
+                                        </tr>
+                                    ))}
+                                    </tbody>
+                                </table>
+
+                                {/* Pagination */}
+                                <div className="mt-4 flex justify-center">
+                                    {currentPage > 1 && (
+                                        <button
+                                            onClick={() => changePage(currentPage - 1)}
+                                            className="px-4 py-2 bg-gray-300 rounded-l-md hover:bg-gray-400"
+                                        >
+                                            &#60; Previous
+                                        </button>
+                                    )}
+                                    <span className="px-3 py-2">{currentPage}</span>
+                                    {currentPage < totalPages && (
+                                        <button
+                                            onClick={() => changePage(currentPage + 1)}
+                                            className="px-4 py-2 bg-gray-300 rounded-r-md hover:bg-gray-400"
+                                        >
+                                            Next &#62;
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         ) : (
                             <p>Tidak ada pengguna yang ditemukan.</p>
                         )}

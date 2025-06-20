@@ -24,8 +24,8 @@ export const loginUser = async (userData) => {
 }
 
 // Get all users
-export const getAllUsers = async () => {
-    const response = await fetch(API_BASE_URL, {
+export const getAllUsers = async (page) => {
+    const response = await fetch(`${API_BASE_URL}?page=${page}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
