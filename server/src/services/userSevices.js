@@ -70,22 +70,15 @@ export const getUsersByGradeService = async (gradeId) => {
     }
 }
 
-// Get all user with pagination
-export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') => {
-    try {
-        return await getAllUserModel(offset, limit, searchTerm); // Call updated model with offset and limit
-    } catch (error) {
-        throw new Error('Error in getAllUserService: ' + error.message);
-    }
-}
 
 // Get total user count for pagination
-export const getTotalUserCount = async () => {
+export const getTotalUserCount = async (searchTerm = '') => {
     try {
-        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1'; // SQL to count total users
+        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1 AND name LIKE ?'; // SQL to count total users
         return new Promise((resolve, reject) => {
-            db.query(sql, (error, results) => {
+            db.query(sql,[`%${searchTerm}%`],  (error, results) => {
                 if (error) {
+                    console.error("Error counting users:", error);
                     return reject(error);
                 }
                 resolve(results[0].count);
@@ -93,6 +86,17 @@ export const getTotalUserCount = async () => {
         });
     } catch (error) {
         throw new Error('Error in getTotalUserCount: ' + error.message);
+    }
+}
+
+// Get all users with pagination and search functionality
+export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') => {
+    try {
+        const totalCount = await getTotalUserCount(searchTerm);
+        const users = await getAllUserModel(offset, limit, searchTerm); // Call updated model with offset and limit
+        return { users, totalCount };
+    } catch (error) {
+        throw new Error('Error in getAllUserService: ' + error.message);
     }
 }
 

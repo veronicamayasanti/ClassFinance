@@ -3,10 +3,10 @@ import {
     registerUserservice,
     loginUserService,
     getAllUserService,
+    getTotalUserCount,
     getUserByIdService,
     getUsersByRoleService,
     getUsersByGradeService,
-    getTotalUserCount,
     updateUserService,
     deleteUserService
 } from "../services/userSevices.js";
@@ -49,11 +49,7 @@ export const getAllUserController = async (req, res) => {
     const offset = (page - 1) * limit;
 
     try {
-        const [users, totalCount] = await Promise.all([
-            getAllUserService(offset, limit, searchTerm), // Fetch only limited users now
-            getTotalUserCount() // Fetch total count of users
-        ]);
-
+        const { users, totalCount } = await getAllUserService(offset, limit, searchTerm);
         const usersWithoutPassword = users.map(({ password, ...rest }) => rest);
         const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
 

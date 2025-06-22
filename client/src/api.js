@@ -24,15 +24,15 @@ export const loginUser = async (userData) => {
 }
 
 // Get all users
-export const getAllUsers = async (page) => {
-    const response = await fetch(`${API_BASE_URL}?page=${page}`, {
+export const getAllUsers = async (page, searchTerm = '') => {
+    const response = await fetch(`${API_BASE_URL}?page=${page}&search=${encodeURIComponent(searchTerm)}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
     });
     if (!response.ok) {
-        throw new Error('Failed to fetch users'); // Menangani kesalahan jika respons tidak ok
+        throw new Error('Failed to fetch users');
     }
-    return response.json(); // Mengembalikan hasil JSON
+    return response.json();
 };

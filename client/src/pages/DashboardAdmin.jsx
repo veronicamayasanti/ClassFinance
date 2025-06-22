@@ -9,6 +9,7 @@ const DashboardPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [showUsers, setShowUsers] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
 
     const userName = localStorage.getItem('userName') || 'User'; // Default to 'User' if name is not found
@@ -20,12 +21,12 @@ const DashboardPage = () => {
         navigate('/login');
     };
 
-    const fetchUsers = async (page) => {
+    const fetchUsers = async (page, searchTerm) => {
         try {
-            const result = await getAllUsers(page);
-            console.log(result)
+            const result = await getAllUsers(page, searchTerm);
             setUsers(result.users);
             setTotalPages(result.totalPages);
+            console.log(result)
         } catch (err) {
             setError(err.message);
             console.error("Error fetching users:", err);
@@ -33,20 +34,66 @@ const DashboardPage = () => {
     };
 
     const handleShowUsers = () => {
-        fetchUsers(currentPage); // Panggil function untuk mengambil data
-        setShowUsers(true); // Set state untuk menunjukkan tabel
+        fetchUsers(currentPage, searchTerm);
+        setShowUsers(true);
     };
 
     useEffect(() => {
         if (showUsers) {
-            fetchUsers(currentPage);
+            fetchUsers(currentPage, searchTerm);
         }
-    }, [currentPage, showUsers]);
+    }, [currentPage, showUsers, searchTerm]);
+
+    // Fungsi untuk menangani perubahan input pencarian
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearchTerm(value);
+        setCurrentPage(1); // Set currentPage ke 1 saat pencarian diubah
+
+        // Ambil pengguna sesuai dengan nilai pencarian
+        fetchUsers(1, value); // Panggil fungsi fetching dengan page 1
+    };
+
 
     const changePage = (page) => {
-        if (page < 1 || page > totalPages) return;
+        if (page < 1 || page > totalPages) return; // Validasi halaman
         setCurrentPage(page);
-        fetchUsers(page);
+        fetchUsers(page, searchTerm); // Ambil pengguna sesuai dengan halaman dan searchTerm
+    };
+
+    const renderPagination = () => {
+        const pages = [];
+
+        const startPage = Math.max(1, currentPage - 2); // Halaman awal (2 halaman sebelum)
+        const endPage = Math.min(totalPages, currentPage + 2); // Halaman akhir (2 halaman setelah)
+
+        if (startPage > 1) {
+            pages.push(1); // Halaman pertama
+            if (startPage > 2) pages.push('...'); // Ellipsis jika ada halaman di antara
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            pages.push(i);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) pages.push('...'); // Ellipsis jika ada halaman di antara
+            pages.push(totalPages); // Halaman terakhir
+        }
+        return (
+            <div className="mt-4 flex justify-center">
+                {pages.map((page, index) => (
+                    <button
+                        key={index}
+                        onClick={() => changePage(page)}
+                        className={`px-4 py-2 ${page === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-300'} rounded-md hover:bg-gray-400`}
+                        disabled={page === '...' || (page === currentPage)}
+                    >
+                        {page}
+                    </button>
+                ))}
+            </div>
+        );
     };
 
     return (
@@ -69,59 +116,64 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex-1 p-10 bg-gray-100">
+
+
+
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang, {userName}!</h1>
+
+
 
                 {showUsers && (
                     <div className="mt-5">
+
+
+
                         {error && <p className="text-red-500">{error}</p>}
-                        {users.length > 0 ? (
-                            <div>
-                                <h4 className="text-3xl font-semibold mb-4"> semua user </h4>
-                                <table className="min-w-full border border-gray-300">
-                                    <thead>
-                                    <tr>
-                                        <th className="border-b p-2 text-left">Nama</th>
-                                        <th className="border-b p-2 text-left">Nomor Telepon</th>
-                                        <th className="border-b p-2 text-left">Email</th>
-                                        <th className="border-b p-2 text-left">Grade ID</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {users.map((user) => (
+
+                        <div>
+                            <h4 className="text-3xl font-semibold mb-4"> Semuanya Pengguna </h4>
+
+                            <div className="mb-5">
+                                <input
+                                    type="text"
+                                    placeholder="Search by name"
+                                    value={searchTerm}
+                                    onChange={handleSearchChange}
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-5 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                />
+                            </div>
+
+
+                            <table className="min-w-full border border-gray-300">
+                                <thead>
+                                <tr>
+                                    <th className="border-b p-2 text-left">Nama</th>
+                                    <th className="border-b p-2 text-left">Nomor Telepon</th>
+                                    <th className="border-b p-2 text-left">Email</th>
+                                    <th className="border-b p-2 text-left">Grade ID</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {users.length > 0 ? (
+                                    users.map((user) => (
                                         <tr key={user.id}>
                                             <td className="border-b p-2">{user.name}</td>
                                             <td className="border-b p-2">{user.phone_number}</td>
                                             <td className="border-b p-2">{user.email}</td>
                                             <td className="border-b p-2">{user.grade_id}</td>
                                         </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan="4" className="border-b p-2 text-center">Tidak ada pengguna yang ditemukan.</td>
+                                    </tr>
+                                )}
+                                </tbody>
+                            </table>
 
-                                {/* Pagination */}
-                                <div className="mt-4 flex justify-center">
-                                    {currentPage > 1 && (
-                                        <button
-                                            onClick={() => changePage(currentPage - 1)}
-                                            className="px-4 py-2 bg-gray-300 rounded-l-md hover:bg-gray-400"
-                                        >
-                                            &#60; Previous
-                                        </button>
-                                    )}
-                                    <span className="px-3 py-2">{currentPage}</span>
-                                    {currentPage < totalPages && (
-                                        <button
-                                            onClick={() => changePage(currentPage + 1)}
-                                            className="px-4 py-2 bg-gray-300 rounded-r-md hover:bg-gray-400"
-                                        >
-                                            Next &#62;
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                        ) : (
-                            <p>Tidak ada pengguna yang ditemukan.</p>
-                        )}
+                            {/* Pagination */}
+                            {renderPagination()}
+                        </div>
                     </div>
                 )}
             </div>
