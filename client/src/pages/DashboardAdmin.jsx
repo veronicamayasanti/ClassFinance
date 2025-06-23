@@ -10,6 +10,7 @@ const DashboardPage = () => {
     const [totalPages, setTotalPages] = useState(0);
     const [showUsers, setShowUsers] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const [limit, setLimit] = useState(2);
     const navigate = useNavigate();
 
     const userName = localStorage.getItem('userName') || 'User'; // Default to 'User' if name is not found
@@ -22,8 +23,9 @@ const DashboardPage = () => {
     };
 
     const fetchUsers = async (page, searchTerm) => {
+        console.log("Fetching users for page:", page, "with searchTerm:", searchTerm, "limit", limit);
         try {
-            const result = await getAllUsers(page, searchTerm);
+            const result = await getAllUsers(page,limit, searchTerm );
             setUsers(result.users);
             setTotalPages(result.totalPages);
             console.log(result)
@@ -42,7 +44,7 @@ const DashboardPage = () => {
         if (showUsers) {
             fetchUsers(currentPage, searchTerm);
         }
-    }, [currentPage, showUsers, searchTerm]);
+    }, [currentPage, showUsers, searchTerm, limit]);
 
     // Fungsi untuk menangani perubahan input pencarian
     const handleSearchChange = (e) => {
@@ -116,23 +118,12 @@ const DashboardPage = () => {
             </div>
 
             <div className="flex-1 p-10 bg-gray-100">
-
-
-
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang, {userName}!</h1>
-
-
-
                 {showUsers && (
                     <div className="mt-5">
-
-
-
                         {error && <p className="text-red-500">{error}</p>}
-
                         <div>
                             <h4 className="text-3xl font-semibold mb-4"> Semuanya Pengguna </h4>
-
                             <div className="mb-5">
                                 <input
                                     type="text"
@@ -143,6 +134,24 @@ const DashboardPage = () => {
                                 />
                             </div>
 
+                            {/* Form select untuk menentukan jumlah data yang ditampilkan */}
+                            <div className="mb-5">
+                                <label className="block text-sm font-medium text-gray-900 mb-1">Tampilkan:</label>
+                                <select
+                                    value={limit}
+                                    onChange={(e) => {
+                                        setLimit(Number(e.target.value));
+                                        setCurrentPage(1); // Reset halaman ke 1 ketika limit diubah
+                                        fetchUsers(1, searchTerm); // Ambil data baru sesuai limit
+                                    }}
+                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                >
+                                    <option value={2}>2</option>
+                                    <option value={5}>5</option>
+                                    <option value={10}>10</option>
+                                    <option value={15}>15</option>
+                                </select>
+                            </div>
 
                             <table className="min-w-full border border-gray-300">
                                 <thead>

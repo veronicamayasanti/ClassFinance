@@ -24,8 +24,8 @@ export const loginUser = async (userData) => {
 }
 
 // Get all users
-export const getAllUsers = async (page, searchTerm = '') => {
-    const response = await fetch(`${API_BASE_URL}?page=${page}&search=${encodeURIComponent(searchTerm)}`, {
+export const getAllUsers = async (page, limit, searchTerm = '') => {
+    const response = await fetch(`${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -36,3 +36,4 @@ export const getAllUsers = async (page, searchTerm = '') => {
     }
     return response.json();
 };
+

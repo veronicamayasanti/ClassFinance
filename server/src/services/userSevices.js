@@ -74,7 +74,7 @@ export const getUsersByGradeService = async (gradeId) => {
 // Get total user count for pagination
 export const getTotalUserCount = async (searchTerm = '') => {
     try {
-        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1 AND name LIKE ?'; // SQL to count total users
+        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1 AND name LIKE ? '; // SQL to count total users
         return new Promise((resolve, reject) => {
             db.query(sql,[`%${searchTerm}%`],  (error, results) => {
                 if (error) {
@@ -93,7 +93,7 @@ export const getTotalUserCount = async (searchTerm = '') => {
 export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') => {
     try {
         const totalCount = await getTotalUserCount(searchTerm);
-        const users = await getAllUserModel(offset, limit, searchTerm); // Call updated model with offset and limit
+        const users = await getAllUserModel(offset, limit, searchTerm);
         return { users, totalCount };
     } catch (error) {
         throw new Error('Error in getAllUserService: ' + error.message);
