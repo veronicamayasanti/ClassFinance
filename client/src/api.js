@@ -37,3 +37,25 @@ export const getAllUsers = async (page, limit, searchTerm = '') => {
     return response.json();
 };
 
+// Update user
+export const updateUserApi = async (id, userData) => {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+    });
+    return response.json();
+};
+
+// Delete user
+export const deleteUser = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+    return response.json(); // Mengembalikan respons dari server
+};

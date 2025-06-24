@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllUsers } from '../api';
+import { getAllUsers, updateUserApi, deleteUser } from '../api';
+import UpdateModal from "./UpdateModal.jsx";
+import DeleteModal from "./DeleteModal.jsx";
 
 
 const DashboardPage = () => {
@@ -11,9 +13,13 @@ const DashboardPage = () => {
     const [showUsers, setShowUsers] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
+    const [selectedUser, setSelectedUser] = useState(null); // State untuk menyimpan pengguna yang dipilih
+    const [isModalOpen, setIsModalOpen] = useState(false); // State untuk membuka modal
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // New state for delete modal
+    const [userToDelete, setUserToDelete] = useState(null); // State to store user id to delete
     const navigate = useNavigate();
 
-    const userName = localStorage.getItem('userName') || 'User'; // Default to 'User' if name is not found
+    const userName = localStorage.getItem('userName') || 'User';
 
     const handleLogout = () => {
         localStorage.removeItem('userName');
@@ -23,15 +29,12 @@ const DashboardPage = () => {
     };
 
     const fetchUsers = async (page, searchTerm) => {
-        console.log("Fetching users for page:", page, "with searchTerm:", searchTerm, "limit", limit);
         try {
-            const result = await getAllUsers(page,limit, searchTerm );
+            const result = await getAllUsers(page, limit, searchTerm );
             setUsers(result.users);
             setTotalPages(result.totalPages);
-            console.log(result)
         } catch (err) {
             setError(err.message);
-            console.error("Error fetching users:", err);
         }
     };
 
@@ -46,6 +49,8 @@ const DashboardPage = () => {
         }
     }, [currentPage, showUsers, searchTerm, limit]);
 
+
+
     // Fungsi untuk menangani perubahan input pencarian
     const handleSearchChange = (e) => {
         const value = e.target.value;
@@ -55,7 +60,6 @@ const DashboardPage = () => {
         // Ambil pengguna sesuai dengan nilai pencarian
         fetchUsers(1, value); // Panggil fungsi fetching dengan page 1
     };
-
 
     const changePage = (page) => {
         if (page < 1 || page > totalPages) return; // Validasi halaman
@@ -98,20 +102,62 @@ const DashboardPage = () => {
         );
     };
 
+    // Fungsi untuk mengupdate pengguna
+    const handleUpdateUser = async (user) => {
+        setSelectedUser(user); // Simpan pengguna yang dipilih
+        console.log(user)
+        setIsModalOpen(true); // Buka modal
+    };
+
+    // Fungsi untuk menutup modal
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedUser(null); // Reset user yang dipilih
+    };
+
+    // Update onSubmit logic
+    const updateUser = async (userId, userData) => {
+        try {
+            await updateUserApi(userId, userData); // Pastikan memanggil API update
+            console.log(userData)
+            fetchUsers(currentPage, searchTerm); // Refresh data setelah update
+            closeModal(); // Tutup modal setelah selesai
+        } catch (error) {
+            setError('Error updating user: ' + error.message);
+        }
+    };
+
+    const confirmDeleteUser = (id) => {
+        setUserToDelete(id); // Store user ID to delete
+        setIsDeleteModalOpen(true); // Open delete modal
+    };
+
+    // Fungsi untuk menghapus pengguna
+    const handleDeleteUser = async () => {
+        if (userToDelete) {
+            try {
+                await deleteUser(userToDelete); // Delete user by ID
+                fetchUsers(currentPage, searchTerm); // Refresh data after delete
+                setIsDeleteModalOpen(false); // Close modal
+            } catch (error) {
+                setError('Error deleting user: ' + error.message);
+            }
+        }
+    };
+
     return (
         <div className="flex min-h-screen">
             <div className="w-1/4 bg-gray-800 text-white p-5">
-                <h2 className="text-2xl font-bold mb-4">SDN Cileles</h2>
+                <h2 className="text-2xl font-bold mb-4">Laporan Kas kelas SDN Cileles</h2>
                 <ul className="space-y-2">
-                    <li>
-                        <button onClick={handleLogout} className="w-full text-left bg-red-600 hover:bg-red-500 px-4 py-2 rounded">
-                            Logout
-                        </button>
-                    </li>
-
                     <li>
                         <button onClick={handleShowUsers} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
                             Tampilkan Semua Pengguna
+                        </button>
+                    </li>
+                    <li>
+                        <button onClick={handleLogout} className="w-full text-left bg-red-600 hover:bg-red-500 px-4 py-2 rounded">
+                            Logout
                         </button>
                     </li>
                 </ul>
@@ -160,6 +206,7 @@ const DashboardPage = () => {
                                     <th className="border-b p-2 text-left">Nomor Telepon</th>
                                     <th className="border-b p-2 text-left">Email</th>
                                     <th className="border-b p-2 text-left">Grade ID</th>
+                                    <th className="border-b p-2 text-left">Aksi</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -170,6 +217,20 @@ const DashboardPage = () => {
                                             <td className="border-b p-2">{user.phone_number}</td>
                                             <td className="border-b p-2">{user.email}</td>
                                             <td className="border-b p-2">{user.grade_id}</td>
+                                            <td className="border-b p-2">
+                                                <button
+                                                    onClick={() => handleUpdateUser(user)} // Tombol untuk update
+                                                    className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
+                                                >
+                                                    Update
+                                                </button>
+                                                <button
+                                                    onClick={() => confirmDeleteUser(user.id)} // Tombol untuk delete
+                                                    className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 ml-2 rounded"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
@@ -186,6 +247,27 @@ const DashboardPage = () => {
                     </div>
                 )}
             </div>
+
+            {isModalOpen && (
+                <UpdateModal
+                    isOpen={isModalOpen}
+                    user={selectedUser}
+                    onClose={closeModal}
+                    onSubmit={async (userData) => {
+                        await updateUser(selectedUser.id, userData); // Pastikan ID pengguna yang tepat
+                    }}
+                />
+            )}
+
+            {isDeleteModalOpen && ( // Add Delete Modal integration
+                <DeleteModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)} // Close the modal
+                    onDelete={handleDeleteUser} // Function to delete user
+                />
+            )}
+
+
         </div>
     );
 };

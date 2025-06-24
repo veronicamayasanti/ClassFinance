@@ -3,7 +3,6 @@ import {
     registerUserservice,
     loginUserService,
     getAllUserService,
-    getTotalUserCount,
     getUserByIdService,
     getUsersByRoleService,
     getUsersByGradeService,
@@ -116,17 +115,19 @@ export const updateUserController = async (req, res) => {
     const userId = req.params.id; // Get user ID from URL parameters
     const { name, phone_number, email, grade_id } = req.body;  // Get updated user data from request body
     try {
-        // Log the data received to ensure it is valid
-        console.log("Data received for update:", req.body);
+        // Dapatkan user saat ini dari database
+        const currentUser = await getUserByIdService(userId);
 
-        // Check if the new email already exists for a different user
-        const emailExists = await checkEmailExists(email);
-        if (emailExists) {
-            return res.status(400).json({ error: "Email already exists for another user." });
+        // Cek apakah email yang di-input baru berbeda dari email yang saat ini
+        if (currentUser.email !== email) {
+            const emailExists = await checkEmailExists(email);
+            if (emailExists) {
+                return res.status(400).json({ error: "Email already exists for another user." });
+            }
         }
 
-        const updatedUser = await updateUserService(userId, name, phone_number, email, grade_id); // Call service to update user
-        res.json({ message: 'User updated successfully', user: updatedUser });
+        await updateUserService(userId, name, phone_number, email, grade_id); // Call service to update user
+        res.json({ message: 'User updated successfully', user: req.body });
     } catch (error) {
         console.error("Update Error:", error);
         res.status(500).json({ error: 'error in updateUserController', message: error.message });
@@ -144,3 +145,4 @@ export const deleteUserController = async (req, res) => {
         res.status(500).json({ error: 'error in deleteUserController', message: error.message });
     }
 }
+
