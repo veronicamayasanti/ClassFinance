@@ -1,14 +1,14 @@
 import React from 'react';
 
 function DeleteModal({ isOpen, onClose, onDelete }) {
-    if (!isOpen) return null; // Jika modal tidak terbuka, kembalikan null
+    if (!isOpen) return null;
 
     return (
         <div
             id="deleteModal"
             tabIndex="-1"
             aria-hidden={!isOpen}
-            className={`fixed inset-0 z-50 flex items-center justify-center`} style={{ backdropFilter: 'blur(2px)' }}
+            className={`fixed inset-0 z-50 flex items-center justify-center`} style={{ backdropFilter: 'blur(3px)' }}
         >
             <div className="relative p-4 w-full max-w-md max-h-full">
                 {/* Modal content */}

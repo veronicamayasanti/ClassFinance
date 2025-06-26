@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getAllUsers, updateUserApi, deleteUser } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
 import DeleteModal from "./DeleteModal.jsx";
+import ToastSuccessModal from "./ToastSuccessModal.jsx";
 
 
 const DashboardPage = () => {
@@ -13,12 +14,13 @@ const DashboardPage = () => {
     const [showUsers, setShowUsers] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
-    const [selectedUser, setSelectedUser] = useState(null); // State untuk menyimpan pengguna yang dipilih
-    const [isModalOpen, setIsModalOpen] = useState(false); // State untuk membuka modal
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // New state for delete modal
-    const [userToDelete, setUserToDelete] = useState(null); // State to store user id to delete
-    const navigate = useNavigate();
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [userToDelete, setUserToDelete] = useState(null);
+    const [toastVisible, setToastVisible] = useState(false);
 
+    const navigate = useNavigate();
     const userName = localStorage.getItem('userName') || 'User';
 
     const handleLogout = () => {
@@ -104,35 +106,43 @@ const DashboardPage = () => {
 
     // Fungsi untuk mengupdate pengguna
     const handleUpdateUser = async (user) => {
-        setSelectedUser(user); // Simpan pengguna yang dipilih
-        console.log(user)
-        setIsModalOpen(true); // Buka modal
+        setSelectedUser(user);
+        setIsModalOpen(true);
     };
 
-    // Fungsi untuk menutup modal
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedUser(null); // Reset user yang dipilih
     };
 
-    // Update onSubmit logic
+    const handleShowToast = () => {
+        setToastVisible(true);
+        setTimeout(() => {
+            setToastVisible(false); // Hide toast after 3 seconds
+        }, 3000);
+    };
+
     const updateUser = async (userId, userData) => {
         try {
-            await updateUserApi(userId, userData); // Pastikan memanggil API update
-            console.log(userData)
-            fetchUsers(currentPage, searchTerm); // Refresh data setelah update
-            closeModal(); // Tutup modal setelah selesai
+            await updateUserApi(userId, userData);
+            fetchUsers(currentPage, searchTerm);
+            closeModal();
+            handleShowToast()
+            setTimeout(() => {
+                setToastVisible(false); // Hide toast after 3 seconds
+            }, 3000);
         } catch (error) {
             setError('Error updating user: ' + error.message);
         }
     };
+
+
 
     const confirmDeleteUser = (id) => {
         setUserToDelete(id); // Store user ID to delete
         setIsDeleteModalOpen(true); // Open delete modal
     };
 
-    // Fungsi untuk menghapus pengguna
     const handleDeleteUser = async () => {
         if (userToDelete) {
             try {
@@ -241,7 +251,6 @@ const DashboardPage = () => {
                                 </tbody>
                             </table>
 
-                            {/* Pagination */}
                             {renderPagination()}
                         </div>
                     </div>
@@ -254,7 +263,7 @@ const DashboardPage = () => {
                     user={selectedUser}
                     onClose={closeModal}
                     onSubmit={async (userData) => {
-                        await updateUser(selectedUser.id, userData); // Pastikan ID pengguna yang tepat
+                        await updateUser(selectedUser.id, userData);
                     }}
                 />
             )}
@@ -263,10 +272,14 @@ const DashboardPage = () => {
                 <DeleteModal
                     isOpen={isDeleteModalOpen}
                     onClose={() => setIsDeleteModalOpen(false)} // Close the modal
-                    onDelete={handleDeleteUser} // Function to delete user
+                    onDelete={handleDeleteUser}
                 />
             )}
 
+            <ToastSuccessModal
+                isVisible={toastVisible}
+                onClose={() => setToastVisible(false)}
+            />
 
         </div>
     );

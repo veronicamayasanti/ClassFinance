@@ -1,19 +1,26 @@
 import React from 'react';
 
-const UpdateModal = ({ isOpen, onClose, onSubmit, user }) => {
-    if (!isOpen) return null; // Jika modal tidak terbuka, kembalikan null
 
-    const handleSubmit = (e) => {
-        e.preventDefault(); // Mencegah reload halaman
-        onSubmit({
-            name: document.getElementById('name').value, // Dapatkan nilai dari input
+const UpdateModal = ({ isOpen, onClose, onSubmit, user }) => {
+    if (!isOpen) return null;
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+        await onSubmit({
+            name: document.getElementById('name').value,
             phone_number: document.getElementById('phone_number').value,
             email: document.getElementById('email').value,
             grade_id: document.getElementById('grade_id').value,
-        }); // Menggunakan objek untuk menyimpan data};
+        })
+    } catch (error){
+            console.error('error updateing user: ', error)
     }
+    };
+
+
     return (
-        <div className={`fixed inset-0 z-50 flex items-center justify-center`} style={{ backdropFilter: 'blur(2px)' }}>
+        <div className={`fixed inset-0 z-50 flex items-center justify-center`} style={{ backdropFilter: 'blur(3px)' }}>
         <div className="relative p-6 w-full max-w-2xl bg-gray-300 rounded-lg shadow-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                 <h3 className="text-lg font-semibold text-gray-900">Update User</h3>
@@ -38,7 +45,7 @@ const UpdateModal = ({ isOpen, onClose, onSubmit, user }) => {
                                     type="text"
                                     name="name"
                                     id="name"
-                                    defaultValue={user.name} // Menggunakan defaultValue untuk menampilkan data pengguna yang ada
+                                    defaultValue={user.name}
                                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5"
                                     required
                                 />
