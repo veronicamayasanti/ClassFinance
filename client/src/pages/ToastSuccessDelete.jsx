@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ToastSuccessModal({ isVisible, onClose }) {
+function ToastSuccessDelete({ isVisible, onClose }) {
     if (!isVisible) return null;
 
     return (
@@ -10,10 +10,10 @@ function ToastSuccessModal({ isVisible, onClose }) {
             style={{ backdropFilter: 'blur(3px)' }}
             role="alert"
         >
-            <div className="relative p-4 max-w-xs bg-gray-300 rounded-lg shadow-lg">
+            <div className="relative p-4 max-w-xs bg-red-600 rounded-lg shadow-lg">
                 <div className="flex items-center">
                     <svg
-                        className="w-5 h-5 text-green-500"
+                        className="w-5 h-5 text-white"
                         aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="currentColor"
@@ -22,11 +22,11 @@ function ToastSuccessModal({ isVisible, onClose }) {
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"/>
                     </svg>
                     <span className="sr-only">Check icon</span>
-                    <div className="ms-3 text-sm font-normal">Update User successfully.</div>
+                    <div className="ms-3 text-sm font-normal text-white">Delete User successfully.</div>
                     <button
                         type="button"
                         onClick={onClose} // Call the close function
-                        className="ms-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8"
+                        className="ms-auto -mx-1.5 -my-1.5 text-gray-900 hover:text-gray-900 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8"
                         aria-label="Close"
                     >
                         <span className="sr-only">Close</span>
@@ -52,4 +52,4 @@ function ToastSuccessModal({ isVisible, onClose }) {
 )
 }
 
-export default ToastSuccessModal;
+export default ToastSuccessDelete;

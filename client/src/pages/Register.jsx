@@ -3,48 +3,41 @@ import { registerUser } from '../api.js';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
-    // State untuk menyimpan data input
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [roleId] = useState(3);
-    const [gradeId, setGradeId] = useState(1); // Atau nilai default sesuai kebutuhan
+    const [gradeId, setGradeId] = useState(1);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const navigate = useNavigate();
 
-    // Fungsi untuk menangani pengiriman form
     const handleSubmit = async (e) => {
-        e.preventDefault(); // Mencegah reload halaman saat submit form
+        e.preventDefault();
 
         try {
             const userData = { name, phone_number: phoneNumber, email, password,role_id: roleId, grade_id: gradeId };
             const response = await registerUser(userData);
 
             if (response.error) {
-                // Menetapkan error jika ada
                 setError(response.error);
                 setSuccessMessage(null);
             } else {
-                // Menetapkan success message jika pendaftaran berhasil
-                setSuccessMessage('Registration successful!');
+                setSuccessMessage(response.message);
                 setError(null);
 
-                // Setel semua state kembali ke nilai kosong setelah pendaftaran berhasil
                 setName('');
                 setPhoneNumber('');
                 setEmail('');
                 setPassword('');
-                setGradeId(1); // Setel kembali ke nilai default
+                setGradeId(1);
 
                 navigate('/login')
             }
         } catch (err) {
-            setError('An error occurred. Please try again.'); // Menangani error jika ada
+            setError(err.message);
             setSuccessMessage(null);
-
-
         }
     };
     return (

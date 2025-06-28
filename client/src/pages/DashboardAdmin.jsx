@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAllUsers, updateUserApi, deleteUser } from '../api';
+import { getAllUsers, updateUserApi, deleteUser, registerUser } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
 import DeleteModal from "./DeleteModal.jsx";
-import ToastSuccessModal from "./ToastSuccessModal.jsx";
+import AddUserModal from "./AddUserModal.jsx";
+import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
+import ToastSuccessDelete from "./ToastSuccessDelete.jsx";
+
+
 
 
 const DashboardPage = () => {
@@ -15,10 +19,17 @@ const DashboardPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
     const [selectedUser, setSelectedUser] = useState(null);
+
+
+
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+
+
     const [toastVisible, setToastVisible] = useState(false);
+    const [toastVisibleDelete, setToastVisibleDelete] = useState(false);
 
     const navigate = useNavigate();
     const userName = localStorage.getItem('userName') || 'User';
@@ -52,15 +63,11 @@ const DashboardPage = () => {
     }, [currentPage, showUsers, searchTerm, limit]);
 
 
-
-    // Fungsi untuk menangani perubahan input pencarian
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
         setCurrentPage(1); // Set currentPage ke 1 saat pencarian diubah
-
-        // Ambil pengguna sesuai dengan nilai pencarian
-        fetchUsers(1, value); // Panggil fungsi fetching dengan page 1
+        fetchUsers(1, value);
     };
 
     const changePage = (page) => {
@@ -104,7 +111,6 @@ const DashboardPage = () => {
         );
     };
 
-    // Fungsi untuk mengupdate pengguna
     const handleUpdateUser = async (user) => {
         setSelectedUser(user);
         setIsModalOpen(true);
@@ -112,7 +118,7 @@ const DashboardPage = () => {
 
     const closeModal = () => {
         setIsModalOpen(false);
-        setSelectedUser(null); // Reset user yang dipilih
+        setSelectedUser(null);
     };
 
     const handleShowToast = () => {
@@ -136,7 +142,22 @@ const DashboardPage = () => {
         }
     };
 
+    const handleAddUser = async (userData) => {
+        try {
+            await registerUser(userData);
+            fetchUsers(currentPage, searchTerm);
+            setIsAddUserModalOpen(false);
+        } catch (error) {
+            setError('Error adding user: ' + error.message);
+        }
+    };
 
+    const handleShowToastDelete = () => {
+        setToastVisibleDelete(true);
+        setTimeout(() => {
+            setToastVisibleDelete(false); // Hide toast after 3 seconds
+        }, 3000);
+    };
 
     const confirmDeleteUser = (id) => {
         setUserToDelete(id); // Store user ID to delete
@@ -149,6 +170,7 @@ const DashboardPage = () => {
                 await deleteUser(userToDelete); // Delete user by ID
                 fetchUsers(currentPage, searchTerm); // Refresh data after delete
                 setIsDeleteModalOpen(false); // Close modal
+                handleShowToastDelete()
             } catch (error) {
                 setError('Error deleting user: ' + error.message);
             }
@@ -179,19 +201,16 @@ const DashboardPage = () => {
                     <div className="mt-5">
                         {error && <p className="text-red-500">{error}</p>}
                         <div>
-                            <h4 className="text-3xl font-semibold mb-4"> Semuanya Pengguna </h4>
-                            <div className="mb-5">
+                            <h4 className="text-3xl font-semibold mb-4"> All User </h4>
+                            <div className="mb-5 flex items-center space-x-4">
                                 <input
                                     type="text"
                                     placeholder="Search by name"
                                     value={searchTerm}
                                     onChange={handleSearchChange}
-                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-5 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                    className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                 />
-                            </div>
 
-                            {/* Form select untuk menentukan jumlah data yang ditampilkan */}
-                            <div className="mb-5">
                                 <label className="block text-sm font-medium text-gray-900 mb-1">Tampilkan:</label>
                                 <select
                                     value={limit}
@@ -200,14 +219,35 @@ const DashboardPage = () => {
                                         setCurrentPage(1); // Reset halaman ke 1 ketika limit diubah
                                         fetchUsers(1, searchTerm); // Ambil data baru sesuai limit
                                     }}
-                                    className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                 >
                                     <option value={2}>2</option>
                                     <option value={5}>5</option>
                                     <option value={10}>10</option>
                                     <option value={15}>15</option>
                                 </select>
+
+                                <button onClick={() => setIsAddUserModalOpen(true)}
+                                        id="createProductModalButton"
+                                        data-modal-target="createProductModal"
+                                        data-modal-toggle="createProductModal"
+                                        className="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                                    <svg
+                                        className="h-3.5 w-3.5 mr-2"
+                                        fill="currentColor"
+                                        viewBox="0 0 20 20"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                        aria-hidden="true">
+                                        <path
+
+                                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                    </svg>
+                                    Add User
+                                </button>
                             </div>
+
+
+
 
                             <table className="min-w-full border border-gray-300">
                                 <thead>
@@ -229,7 +269,7 @@ const DashboardPage = () => {
                                             <td className="border-b p-2">{user.grade_id}</td>
                                             <td className="border-b p-2">
                                                 <button
-                                                    onClick={() => handleUpdateUser(user)} // Tombol untuk update
+                                                    onClick={() => handleUpdateUser(user)}
                                                     className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
                                                 >
                                                     Update
@@ -245,7 +285,9 @@ const DashboardPage = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="4" className="border-b p-2 text-center">Tidak ada pengguna yang ditemukan.</td>
+                                        <td colSpan="4" className="border-b p-2 text-center">Tidak ada pengguna yang
+                                            ditemukan.
+                                        </td>
                                     </tr>
                                 )}
                                 </tbody>
@@ -268,6 +310,16 @@ const DashboardPage = () => {
                 />
             )}
 
+            {isAddUserModalOpen && (
+                <AddUserModal
+                    isOpen={isAddUserModalOpen}
+                    onClose={() => setIsAddUserModalOpen(false)} // Close the modal
+                    onSubmit={async (userData) => {
+                        await handleAddUser(userData); // Handle the addition of the new user
+                    }}
+                />
+            )}
+
             {isDeleteModalOpen && ( // Add Delete Modal integration
                 <DeleteModal
                     isOpen={isDeleteModalOpen}
@@ -276,10 +328,16 @@ const DashboardPage = () => {
                 />
             )}
 
-            <ToastSuccessModal
+            <ToastSuccessUpdate
                 isVisible={toastVisible}
                 onClose={() => setToastVisible(false)}
             />
+
+            <ToastSuccessDelete
+                isVisible={toastVisibleDelete}
+                onClose={() => setToastVisible(false)}
+            />
+
 
         </div>
     );
