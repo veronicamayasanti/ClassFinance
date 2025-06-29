@@ -1,50 +1,72 @@
 import React, { useState } from 'react';
 import {registerUser} from "../api.js";
+import ToastSuccessAdd from "./ToastSuccessAdd.jsx"; // Import success toast
+import ToastErrorAddUser from "./ToastErrorAddUser.jsx"; // Import error toast
 
 
-const AddUserModal = ({ isOpen, onClose, onSubmit, userData }) => {
+
+const AddUserModal = ({ isOpen, onClose, onSubmit }) => {
     const [name, setName] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [roleId] = useState(3);
     const [gradeId, setGradeId] = useState(1);
+
     const [error, setError] = useState(null);
-    const [successMessage, setSuccessMessage] = useState(null);
+    const [toastVisibleSuccess, setToastVisibleSuccess] = useState(false);
+    const [toastVisibleError, setToastVisibleError] = useState(false);
 
     if (!isOpen) return null;
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const userData = { name, phone_number: phoneNumber, email, password,role_id: roleId, grade_id: gradeId };
-            const response = await registerUser(userData);
+        const userData = {
+            name,
+            phone_number: phoneNumber,
+            email,
+            password,
+            role_id: roleId,
+            grade_id: gradeId
+        };
 
+        try {
+            const response = await registerUser(userData);
             if (response.error) {
                 setError(response.error);
-                setSuccessMessage(null);
+                setToastVisibleSuccess(false);
+                setToastVisibleError(true)
             } else {
-                setSuccessMessage(response.message);
                 setError(null);
+                setToastVisibleSuccess(true);
+                if (onSubmit) {
+                    onSubmit(userData);
+                }
+                onClose(); // Close the modal after successful addition
             }
-        } catch (err) {
-            setError(err.message);
-            setSuccessMessage(null);
+            setTimeout(() => {
+                setToastVisibleSuccess(false);
+                setToastVisibleError(false);
+            }, 3000);
+        } catch (error) {
+            setError('Error adding user: ' + error.message);
+            setToastVisibleSuccess(false);
+            setToastVisibleError(true);
         }
     };
 
 
     return (
         <div className={`fixed inset-0 z-50 flex items-center justify-center`} style={{backdropFilter: 'blur(3px)'}}>
-            <div className="fixed top-5 right-5 z-50 flex items-center p-4 mb-4 text-sm text-red-600 bg-gray-300 rounded-lg "
-                 role="alert">
-                {error && <p className="error">{error}</p>}
-            </div>
-            <div className="fixed top-5 right-5 z-50 flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg "
-                 role="alert">
-                {successMessage && <p className="success">{successMessage}</p>}
-            </div>
-
             <div className="relative p-6 w-full max-w-2xl bg-gray-300 rounded-lg shadow-lg">
+                {/* Toast Message */}
+                {toastVisibleSuccess && (
+                    <ToastSuccessAdd isVisible={toastVisibleSuccess} onClose={() => setToastVisibleSuccess(false)} />
+                )}
+                {toastVisibleError && (
+                    <ToastErrorAddUser isVisible={toastVisibleError} onClose={() => setToastVisibleError(false)} />
+                )}
+
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
                     <h3 className="text-lg font-semibold text-gray-900">Add User</h3>
                     <button
