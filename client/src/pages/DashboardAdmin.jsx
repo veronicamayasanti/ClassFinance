@@ -7,9 +7,6 @@ import AddUserModal from "./AddUserModal.jsx";
 import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
 import ToastSuccessDelete from "./ToastSuccessDelete.jsx";
 
-
-
-
 const DashboardPage = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
@@ -20,16 +17,16 @@ const DashboardPage = () => {
     const [limit, setLimit] = useState(2);
     const [selectedUser, setSelectedUser] = useState(null);
 
-
-
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
 
-
     const [toastVisible, setToastVisible] = useState(false);
     const [toastVisibleDelete, setToastVisibleDelete] = useState(false);
+
+    const [roleIdFilter, setRoleIdFilter] = useState(null);
+    const [gradeIdFilter, setGradeIdFilter] = useState(null);
 
     const navigate = useNavigate();
     const userName = localStorage.getItem('userName') || 'User';
@@ -41,9 +38,9 @@ const DashboardPage = () => {
         navigate('/login');
     };
 
-    const fetchUsers = async (page, searchTerm) => {
+    const fetchUsers = async (page, searchTerm, roleId = null, gradeId = null) => {
         try {
-            const result = await getAllUsers(page, limit, searchTerm );
+            const result = await getAllUsers(page, limit, searchTerm, roleId, gradeId );
             setUsers(result.users);
             setTotalPages(result.totalPages);
         } catch (err) {
@@ -52,7 +49,7 @@ const DashboardPage = () => {
     };
 
     const handleShowUsers = () => {
-        fetchUsers(currentPage, searchTerm);
+        fetchUsers(currentPage, searchTerm, roleIdFilter, gradeIdFilter);
         setShowUsers(true);
     };
 
@@ -61,7 +58,6 @@ const DashboardPage = () => {
             fetchUsers(currentPage, searchTerm);
         }
     }, [currentPage, showUsers, searchTerm, limit]);
-
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
@@ -211,13 +207,13 @@ const DashboardPage = () => {
                                     className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                 />
 
-                                <label className="block text-sm font-medium text-gray-900 mb-1">Tampilkan:</label>
+                                <label className="block text-sm font-medium text-gray-900 mb-1">entries per page:</label>
                                 <select
                                     value={limit}
                                     onChange={(e) => {
                                         setLimit(Number(e.target.value));
-                                        setCurrentPage(1); // Reset halaman ke 1 ketika limit diubah
-                                        fetchUsers(1, searchTerm); // Ambil data baru sesuai limit
+                                        setCurrentPage(1);
+                                        fetchUsers(1, searchTerm);
                                     }}
                                     className="rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
                                 >
@@ -246,6 +242,37 @@ const DashboardPage = () => {
                                 </button>
                             </div>
 
+                            {/* Filters for Role and Grade */}
+                            <div className="mb-5 flex items-center space-x-4">
+                                <select
+                                    value={roleIdFilter}
+                                    onChange={(e) => setRoleIdFilter(e.target.value)}
+                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900"
+                                >
+                                    <option value="">All Roles</option>
+                                    {/* Assuming roleId 2 corresponds to some role */}
+                                    <option value={2}>Role 2</option>
+                                    {/* Add more roles as needed */}
+                                </select>
+
+                                <select
+                                    value={gradeIdFilter}
+                                    onChange={(e) => setGradeIdFilter(Number(e.target.value))}
+                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900"
+                                >
+                                    <option value="">All Grades</option>
+                                    {[1, 2, 3, 4, 5, 6].map((id) => (
+                                        <option key={id} value={id}>Grade {id}</option>
+                                    ))}
+                                </select>
+
+                                <button
+                                    onClick={handleShowUsers}
+                                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded"
+                                >
+                                    Filter
+                                </button>
+                            </div>
 
 
 

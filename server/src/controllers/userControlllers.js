@@ -45,10 +45,12 @@ export const getAllUserController = async (req, res) => {
     const limit = req.query.limit ? parseInt(req.query.limit) : 2; // Set default to 2
     const page = req.query.page ? parseInt(req.query.page) : 1; // Default to 1 if not provided
     const searchTerm = req.query.search || ''; // Get search term
+    const roleId = req.query.roleId ? parseInt(req.query.roleId) : null; // Parse roleId as integer
+    const gradeId = req.query.gradeId ? parseInt(req.query.gradeId) : null; // Parse gradeId as integer
     const offset = (page - 1) * limit;
 
     try {
-        const { users, totalCount } = await getAllUserService(offset, limit, searchTerm);
+        const { users, totalCount } = await getAllUserService(offset, limit, searchTerm, roleId, gradeId);
         const usersWithoutPassword = users.map(({ password, ...rest }) => rest);
         const totalPages = Math.ceil(totalCount / limit); // Calculate total pages
 
@@ -58,11 +60,11 @@ export const getAllUserController = async (req, res) => {
             limit,
             users: usersWithoutPassword,
         });
-
     } catch (error) {
+        console.error("Error in getAllUserController:", error);
         res.status(500).json({ error: 'error in getAllUserController', message: error.message });
     }
-}
+};
 
 // Get user by ID
 export const getUserByIdController = async (req, res) => {

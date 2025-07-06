@@ -24,19 +24,28 @@ export const loginUser = async (userData) => {
 }
 
 // Get all users
-export const getAllUsers = async (page, limit, searchTerm = '') => {
-    const response = await fetch(`${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}`, {
+export const getAllUsers = async (page, limit, searchTerm = '', roleId = null, gradeId = null) => {
+    let url = `${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}&roleId=2`;
+
+    if (roleId) {
+        url += `&roleId=${roleId}`;
+    }
+    if (gradeId) {
+        url += `&gradeId=${gradeId}`;
+    }
+
+    const response = await fetch(url, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         },
     });
+
     if (!response.ok) {
         throw new Error('Failed to fetch users');
     }
     return response.json();
 };
-
 // Update user
 export const updateUserApi = async (id, userData) => {
     const response = await fetch(`${API_BASE_URL}/${id}`, {

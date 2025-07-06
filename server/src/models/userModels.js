@@ -27,17 +27,34 @@ export const loginUserModel = (email) => {return new Promise ((resolve, reject) 
 })}
 
 // get all user
-export const getAllUserModel = (offset = 0, limit = 10, searchTerm = '') => {
+export const getAllUserModel = (offset = 0, limit = 10, searchTerm = '', roleId = null, gradeId = null) => {
     return new Promise((resolve, reject) => {
-        const sql = 'SELECT * FROM tb_users WHERE role_id != 1 AND name LIKE ? LIMIT ?, ? '; // SQL with pagination
-        db.query(sql, [`%${searchTerm}%`, offset, limit], (error, results) => {
+        let sql = 'SELECT * FROM tb_users WHERE role_id != 1 AND name LIKE ?';
+        const params = [`%${searchTerm}%`];
+
+        if (roleId) {
+            sql += ' AND role_id = ?';
+            params.push(roleId);
+        }
+
+        if (gradeId) {
+            sql += ' AND grade_id = ?';
+            params.push(gradeId);
+        }
+
+        sql += ' LIMIT ?, ?'; // Add pagination limits
+        params.push(offset, limit); // Add offset and limit at end
+
+        console.log("Executing SQL:", sql, "with params:", params); // Log query
+
+        db.query(sql, params, (error, results) => {
             if (error) {
-                return reject(error, error.message = "error in model");
+                return reject(error);
             }
             resolve(results);
         });
     });
-}
+};
 
 // Get user by ID
 export const getUserByIdModel = (id) => {

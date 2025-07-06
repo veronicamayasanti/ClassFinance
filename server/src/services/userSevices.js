@@ -72,11 +72,23 @@ export const getUsersByGradeService = async (gradeId) => {
 
 
 // Get total user count for pagination
-export const getTotalUserCount = async (searchTerm = '') => {
+export const getTotalUserCount = async (searchTerm = '', roleId = null, gradeId = null) => {
     try {
-        const sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1 AND name LIKE ? '; // SQL to count total users
+        let sql = 'SELECT COUNT(*) AS count FROM tb_users WHERE role_id != 1 AND name LIKE ?';
+        const params = [`%${searchTerm}%`];
+
+        if (roleId) {
+            sql += ' AND role_id = ?';
+            params.push(roleId);
+        }
+
+        if (gradeId) {
+            sql += ' AND grade_id = ?';
+            params.push(gradeId);
+        }
+
         return new Promise((resolve, reject) => {
-            db.query(sql,[`%${searchTerm}%`],  (error, results) => {
+            db.query(sql, params, (error, results) => {
                 if (error) {
                     console.error("Error counting users:", error);
                     return reject(error);
@@ -87,18 +99,20 @@ export const getTotalUserCount = async (searchTerm = '') => {
     } catch (error) {
         throw new Error('Error in getTotalUserCount: ' + error.message);
     }
+
 }
 
-// Get all users with pagination and search functionality
-export const getAllUserService = async (offset = 0, limit = 10,searchTerm = '') => {
+/// Get all users with pagination and search functionality
+export const getAllUserService = async (offset = 0, limit = 10, searchTerm = '', roleId = null, gradeId = null) => {
     try {
-        const totalCount = await getTotalUserCount(searchTerm);
-        const users = await getAllUserModel(offset, limit, searchTerm);
+        const totalCount = await getTotalUserCount(searchTerm, roleId, gradeId);
+        const users = await getAllUserModel(offset, limit, searchTerm, roleId, gradeId);
         return { users, totalCount };
     } catch (error) {
         throw new Error('Error in getAllUserService: ' + error.message);
     }
-}
+};
+
 
 // Update user
 export const updateUserService = async (id, name, phone_number, email, grade_id) => {
