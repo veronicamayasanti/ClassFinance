@@ -61,7 +61,6 @@ export const getAllUserController = async (req, res) => {
             users: usersWithoutPassword,
         });
     } catch (error) {
-        console.error("Error in getAllUserController:", error);
         res.status(500).json({ error: 'error in getAllUserController', message: error.message });
     }
 };

@@ -45,8 +45,6 @@ export const getAllUserModel = (offset = 0, limit = 10, searchTerm = '', roleId 
         sql += ' LIMIT ?, ?'; // Add pagination limits
         params.push(offset, limit); // Add offset and limit at end
 
-        console.log("Executing SQL:", sql, "with params:", params); // Log query
-
         db.query(sql, params, (error, results) => {
             if (error) {
                 return reject(error);

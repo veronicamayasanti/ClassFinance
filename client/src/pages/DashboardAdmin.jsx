@@ -7,7 +7,7 @@ import AddUserModal from "./AddUserModal.jsx";
 import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
 import ToastSuccessDelete from "./ToastSuccessDelete.jsx";
 
-const DashboardPage = () => {
+const DashboardPageAdmin = () => {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -204,7 +204,7 @@ const DashboardPage = () => {
                                     placeholder="Search by name"
                                     value={searchTerm}
                                     onChange={handleSearchChange}
-                                    className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
+                                    className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm border-2"
                                 />
 
                                 <label className="block text-sm font-medium text-gray-900 mb-1">entries per page:</label>
@@ -215,7 +215,7 @@ const DashboardPage = () => {
                                         setCurrentPage(1);
                                         fetchUsers(1, searchTerm);
                                     }}
-                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
+                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm border-2"
                                 >
                                     <option value={2}>2</option>
                                     <option value={5}>5</option>
@@ -223,58 +223,57 @@ const DashboardPage = () => {
                                     <option value={15}>15</option>
                                 </select>
 
-                                <button onClick={() => setIsAddUserModalOpen(true)}
-                                        id="createProductModalButton"
-                                        data-modal-target="createProductModal"
-                                        data-modal-toggle="createProductModal"
-                                        className="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
-                                    <svg
-                                        className="h-3.5 w-3.5 mr-2"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                         xmlns="http://www.w3.org/2000/svg"
-                                        aria-hidden="true">
-                                        <path
+                                {/* Filters for Role and Grade */}
+                                <div className="mb-5 flex items-center space-x-4">
+                                    <select
+                                        value={roleIdFilter}
+                                        onChange={(e) => setRoleIdFilter(e.target.value)}
+                                        className="rounded-md bg-white px-2 py-1 text-base text-gray-900 border"
+                                    >
+                                        <option value="">All Roles</option>
+                                        {/* Assuming roleId 2 corresponds to some role */}
+                                        <option value={2}>Korlas SD Cileles</option>
 
-                                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                                    </svg>
-                                    Add User
-                                </button>
+                                        {/* Add more roles as needed */}
+                                    </select>
+
+                                    <select
+                                        value={gradeIdFilter}
+                                        onChange={(e) => setGradeIdFilter(Number(e.target.value))}
+                                        className="rounded-md bg-white px-2 py-1 text-base text-gray-900 border"
+                                    >
+                                        <option value="">All Grades</option>
+                                        {[1, 2, 3, 4, 5, 6].map((id) => (
+                                            <option key={id} value={id}>Grade {id}</option>
+                                        ))}
+                                    </select>
+
+                                    <button
+                                        onClick={handleShowUsers}
+                                        className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded"
+                                    >
+                                        Filter
+                                    </button>
+                                </div>
                             </div>
 
-                            {/* Filters for Role and Grade */}
-                            <div className="mb-5 flex items-center space-x-4">
-                                <select
-                                    value={roleIdFilter}
-                                    onChange={(e) => setRoleIdFilter(e.target.value)}
-                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900"
-                                >
-                                    <option value="">All Roles</option>
-                                    {/* Assuming roleId 2 corresponds to some role */}
-                                    <option value={2}>Role 2</option>
-                                    {/* Add more roles as needed */}
-                                </select>
+                            <button onClick={() => setIsAddUserModalOpen(true)}
+                                    id="createProductModalButton"
+                                    data-modal-target="createProductModal"
+                                    data-modal-toggle="createProductModal"
+                                    className="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                                <svg
+                                    className="h-3.5 w-3.5 mr-2"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    aria-hidden="true">
+                                    <path
 
-                                <select
-                                    value={gradeIdFilter}
-                                    onChange={(e) => setGradeIdFilter(Number(e.target.value))}
-                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900"
-                                >
-                                    <option value="">All Grades</option>
-                                    {[1, 2, 3, 4, 5, 6].map((id) => (
-                                        <option key={id} value={id}>Grade {id}</option>
-                                    ))}
-                                </select>
-
-                                <button
-                                    onClick={handleShowUsers}
-                                    className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded"
-                                >
-                                    Filter
-                                </button>
-                            </div>
-
-
+                                        d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                </svg>
+                                Add User
+                            </button>
 
                             <table className="min-w-full border border-gray-300">
                                 <thead>
@@ -370,4 +369,4 @@ const DashboardPage = () => {
     );
 };
 
-export default DashboardPage;
+export default DashboardPageAdmin;
