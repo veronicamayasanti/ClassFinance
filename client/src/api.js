@@ -25,7 +25,7 @@ export const loginUser = async (userData) => {
 
 // Get all users
 export const getAllUsers = async (page, limit, searchTerm = '', roleId = null, gradeId = null) => {
-    let url = `${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}&roleId=${roleId}`;
+    let url = `${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}&roleId=${roleId}&gradeId=${gradeId}`;
 
     if (roleId) {
         url += `&roleId=${roleId}`;
