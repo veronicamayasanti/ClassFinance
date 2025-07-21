@@ -33,13 +33,24 @@ const login = () => {
                 setSuccessMessage('Login successful!');
                 setError(null);
 
-                navigate('/dashboard')
+                // Role-based navigation
+                switch(role_id) {
+                    case 1:
+                        navigate('/dashboard/admin');
+                        break;
+                    case 2:
+                        navigate('/dashboard/operator');
+                        break;
+                    case 3:
+                        navigate('/dashboard/user');
+                        break;
+                    default:
+                        navigate('/'); // Fallback
+                }
             }
         } catch (err) {
             setError('An error occurred. Please try again.'); // Menangani error jika ada
             setSuccessMessage(null);
-
-            navigate('/dashboard')
         }
     };
     return (

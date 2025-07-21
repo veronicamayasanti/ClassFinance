@@ -6,6 +6,7 @@ import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
 import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
 import ToastSuccessDelete from "./ToastSuccessDelete.jsx";
+import Pagination from "./Pagination.jsx";
 
 const DashboardPageAdmin = () => {
     const [users, setUsers] = useState([]);
@@ -35,7 +36,7 @@ const DashboardPageAdmin = () => {
         localStorage.removeItem('userName');
         localStorage.removeItem('userRoleId');
         localStorage.removeItem('userGradeId');
-        navigate('/login');
+        navigate('/');
     };
 
     const fetchUsers = async (page, searchTerm, roleId = null, gradeId = null) => {
@@ -72,40 +73,6 @@ const DashboardPageAdmin = () => {
         fetchUsers(page, searchTerm); // Ambil pengguna sesuai dengan halaman dan searchTerm
     };
 
-    const renderPagination = () => {
-        const pages = [];
-
-        const startPage = Math.max(1, currentPage - 2); // Halaman awal (2 halaman sebelum)
-        const endPage = Math.min(totalPages, currentPage + 2); // Halaman akhir (2 halaman setelah)
-
-        if (startPage > 1) {
-            pages.push(1); // Halaman pertama
-            if (startPage > 2) pages.push('...'); // Ellipsis jika ada halaman di antara
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            pages.push(i);
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) pages.push('...'); // Ellipsis jika ada halaman di antara
-            pages.push(totalPages); // Halaman terakhir
-        }
-        return (
-            <div className="mt-4 flex justify-center">
-                {pages.map((page, index) => (
-                    <button
-                        key={index}
-                        onClick={() => changePage(page)}
-                        className={`px-4 py-2 ${page === currentPage ? 'bg-blue-600 text-white' : 'bg-gray-300'} rounded-md hover:bg-gray-400`}
-                        disabled={page === '...' || (page === currentPage)}
-                    >
-                        {page}
-                    </button>
-                ))}
-            </div>
-        );
-    };
 
     const handleUpdateUser = async (user) => {
         setSelectedUser(user);
@@ -319,7 +286,11 @@ const DashboardPageAdmin = () => {
                                 </tbody>
                             </table>
 
-                            {renderPagination()}
+                            <Pagination
+                                currentPage={currentPage}
+                                totalPages={totalPages}
+                                onPageChange={changePage}
+                            />
                         </div>
                     </div>
                 )}

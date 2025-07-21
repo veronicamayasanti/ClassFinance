@@ -1,31 +1,18 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {useNavigate} from "react-router-dom";
-import {getAllUsers} from "../api.js";
 
-function DashboardOperator() {
-    const [users, setUsers] = useState([])
-    const [currentPage, setCyrrentPage] = useState(1)
-    const [totalUsers,setTotalUsers] = useState(0);
-    const limit = 10
+function DashboardUser(props) {
+    const navigate = useNavigate()
 
     const userName = localStorage.getItem('userName');
     const userGradeId = localStorage.getItem('userGradeId')
 
-    const navigate = useNavigate()
     const handleLogout = () => {
         localStorage.removeItem('userName');
         localStorage.removeItem('userRoleId');
         localStorage.removeItem('userGradeId');
         navigate('/');
     };
-
-    const fetchAllUsers = async () => {
-        try {
-
-        }catch (error) {
-            console.error('Error fetching users', error)
-        }
-    }
 
     return (
         <div className="flex min-h-screen">
@@ -52,4 +39,4 @@ function DashboardOperator() {
     );
 }
 
-export default DashboardOperator;
+export default DashboardUser;
