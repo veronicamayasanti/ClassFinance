@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import { getAllUsers, updateUserApi, deleteUser, registerUser, getUsersByGrade } from '../api';
+import { getAllUsers, updateUserApi, deleteUser, registerUser } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
 import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
