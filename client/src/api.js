@@ -68,3 +68,17 @@ export const deleteUser = async (id) => {
     });
     return response.json(); // Mengembalikan respons dari server
 };
+
+export const getUserById = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/${id}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch user by ID');
+    }
+    return response.json();
+};

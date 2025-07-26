@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import { getAllUsers, updateUserApi, deleteUser, registerUser } from '../api';
+import { getAllUsers, updateUserApi, getUserById  } from '../api';
 import Pagination from "./Pagination.jsx";
 
-function DashboardOperator() {
+function DashboardUser() {
     const [users, setUsers] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -12,28 +12,62 @@ function DashboardOperator() {
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
 
+    const [userProfile, setUserProfile] = useState(null);
+
     const userName = localStorage.getItem('userName');
     const gradeId = localStorage.getItem('userGradeId')
+    const userId = localStorage.getItem('userId')
     const navigate = useNavigate()
 
     const handleLogout = () => {
         localStorage.removeItem('userName');
         localStorage.removeItem('userRoleId');
         localStorage.removeItem('userGradeId');
+        localStorage.removeItem('userId');
         navigate('/');
     };
 
+
+    const fetchProfile = async () => {
+        try {
+            const userData = await getUserById(userId);
+            setUserProfile(userData)
+        } catch (err) {
+            console.error('Failed to fetch user profile: ', err);
+            setError("could not fetch profile data.")
+        }
+    }
+
+    const handleEditProfile = () => {
+        setIsEditing(true);
+    }
+
+    const handleUpdateProfile = async () => {
+        if (!userProfile || !userProfile.id) { // Check if userProfile is null or does not have an id
+            setError("User profile is not initialized.");
+            return;
+        }
+        try {
+            await updateUserApi(userProfile.id, userProfile)
+            fetchUsers(currentPage, searchTerm);
+            setIsEditing(false)
+        } catch (err) {
+            console.error("update failed:", err);
+            setError("Could not update profile.")
+        }
+    }
+
+    const handleInputChange = (e) => {
+        const {name, value} = e.target;
+        setUserProfile((prevState) => ({ ...prevState, [name]: value }));
+    }
+
     const fetchUsers = async (page, searchTerm) => {
-
-        console.log("Fetching users for page:", page, "searchTerm:", searchTerm, "Grade ID:", gradeId); // Log for debugging
-
         try {
             const result = await getAllUsers(page, limit, searchTerm,null,  gradeId );
-            console.log("API Response:", result); // Log the API response
             setUsers(result.users);
             setTotalPages(result.totalPages);
         } catch (err) {
-            console.error("Fetch error:", err); // Log any errors
             setError(err.message);
         }
     };
@@ -68,6 +102,11 @@ function DashboardOperator() {
                 <h2 className="text-2xl font-bold mb-4">Laporan Kas kelas {gradeId} SDN Cileles</h2>
                 <ul className="space-y-2">
                     <li>
+                        <button onClick={fetchProfile} className="w-full text-left bg-green-600 hover:bg-green-500 px-4 py-2 rounded">
+                            My Profile
+                        </button>
+                    </li>
+                    <li>
                         <button onClick={handleShowUsers} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
                             All Students Grade {gradeId}
                         </button>
@@ -82,6 +121,35 @@ function DashboardOperator() {
 
             <div className="flex-1 p-10 bg-gray-100">
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang siswa, {userName} !</h1>
+
+                {error && <p className="text-red-500">{error}</p>}
+
+                {userProfile ? (
+                    <div className="bg-white p-5 rounded shadow-md w-1/2">
+                        <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+                        <p className="flex justify-between">
+                            <span>Full Name:</span>
+                            <span>{userProfile.name}</span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>Email Address:</span>
+                            <span>{userProfile.email}</span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>Phone Number:</span>
+                            <span>{userProfile.phone_number}</span>
+                        </p>
+                        <p className="flex justify-between">
+                            <span>Grade:</span>
+                            <span>{userProfile.grade_id}</span>
+                        </p>
+                    </div>
+                ) : (
+                    <p className="mt-5"></p>
+                )}
+
+
+
                 {showUsers && (
                     <div className="mt-5">
                         {error && <p className="text-red-500">{error}</p>}
@@ -155,4 +223,4 @@ function DashboardOperator() {
     );
 }
 
-export default DashboardOperator;
+export default DashboardUser;
