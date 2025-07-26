@@ -11,7 +11,6 @@ function DashboardUser() {
     const [showUsers, setShowUsers] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
-
     const [userProfile, setUserProfile] = useState(null);
 
     const userName = localStorage.getItem('userName');
@@ -31,36 +30,26 @@ function DashboardUser() {
     const fetchProfile = async () => {
         try {
             const userData = await getUserById(userId);
-            setUserProfile(userData)
+            setUserProfile((prevProfile) => (prevProfile ? null : userData)); // Toggle the profile visibility
+            setShowUsers(false);
         } catch (err) {
-            console.error('Failed to fetch user profile: ', err);
             setError("could not fetch profile data.")
         }
     }
 
-    const handleEditProfile = () => {
-        setIsEditing(true);
-    }
 
-    const handleUpdateProfile = async () => {
-        if (!userProfile || !userProfile.id) { // Check if userProfile is null or does not have an id
-            setError("User profile is not initialized.");
-            return;
+    const handleShowUsers = async () => {
+        if (showUsers) {
+            // If already showing users, clear the user profile and set showUsers to false
+            setUserProfile(null);
+            setShowUsers(false);
+        } else {
+            // Show users
+            await fetchUsers(currentPage, searchTerm);
+            setShowUsers(true);
+            setUserProfile(null); // Clear profile when viewing users
         }
-        try {
-            await updateUserApi(userProfile.id, userProfile)
-            fetchUsers(currentPage, searchTerm);
-            setIsEditing(false)
-        } catch (err) {
-            console.error("update failed:", err);
-            setError("Could not update profile.")
-        }
-    }
-
-    const handleInputChange = (e) => {
-        const {name, value} = e.target;
-        setUserProfile((prevState) => ({ ...prevState, [name]: value }));
-    }
+    };
 
     const fetchUsers = async (page, searchTerm) => {
         try {
@@ -70,11 +59,6 @@ function DashboardUser() {
         } catch (err) {
             setError(err.message);
         }
-    };
-
-    const handleShowUsers = () => {
-        fetchUsers(currentPage, searchTerm);
-        setShowUsers(true);
     };
 
     useEffect(() => {
@@ -125,32 +109,26 @@ function DashboardUser() {
                 {error && <p className="text-red-500">{error}</p>}
 
                 {userProfile ? (
-                    <div className="bg-white p-5 rounded shadow-md w-1/2">
+                    <div className="bg-white p-5 rounded shadow-md w-xs">
                         <h2 className="text-2xl font-bold mb-4">User Profile</h2>
                         <p className="flex justify-between">
-                            <span>Full Name:</span>
+                            <span>Full Name :</span>
                             <span>{userProfile.name}</span>
                         </p>
                         <p className="flex justify-between">
-                            <span>Email Address:</span>
+                            <span>Email Address: </span>
                             <span>{userProfile.email}</span>
                         </p>
                         <p className="flex justify-between">
-                            <span>Phone Number:</span>
+                            <span>Phone Number :</span>
                             <span>{userProfile.phone_number}</span>
                         </p>
                         <p className="flex justify-between">
-                            <span>Grade:</span>
+                            <span>Grade :</span>
                             <span>{userProfile.grade_id}</span>
                         </p>
                     </div>
-                ) : (
-                    <p className="mt-5"></p>
-                )}
-
-
-
-                {showUsers && (
+                ) :  showUsers && (
                     <div className="mt-5">
                         {error && <p className="text-red-500">{error}</p>}
                         <div>
