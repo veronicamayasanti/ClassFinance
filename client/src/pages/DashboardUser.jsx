@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
 import { getAllUsers, updateUserApi, getUserById  } from '../api';
 import Pagination from "./Pagination.jsx";
+import UpdateModal from "./UpdateModal.jsx";
+import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
 
 function DashboardUser() {
     const [users, setUsers] = useState([]);
@@ -12,6 +14,8 @@ function DashboardUser() {
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
     const [userProfile, setUserProfile] = useState(null);
+    const [isProfileModalOpen, setProfileModalOpen] = useState(false);
+    const [isToastVisible, setToastVisible] = useState(false);
 
     const userName = localStorage.getItem('userName');
     const gradeId = localStorage.getItem('userGradeId')
@@ -80,6 +84,34 @@ function DashboardUser() {
         fetchUsers(page, searchTerm);
     };
 
+    const handleEditProfile = () => {
+        setProfileModalOpen(true);
+    }
+
+    const handleProfileUpdate = async (updatedUser) => {
+        try {
+            await updateUserApi(userId, updatedUser);
+            setUserProfile(updatedUser);
+            setToastVisible(true); // Show toast on successful update
+            setProfileModalOpen(false);
+        } catch (error) {
+            setError("Failed to update profile.");
+        }
+    };
+
+    const closeToast = () => {
+        setToastVisible(false);
+    };
+    useEffect(() => {
+        if (isToastVisible) {
+            const timer = setTimeout(() => {
+                setToastVisible(false);
+            }, 2000);
+            return () => clearTimeout(timer);
+        }
+    }, [isToastVisible]);
+
+
     return (
         <div className="flex min-h-screen">
             <div className="w-1/4 bg-gray-800 text-white p-5">
@@ -127,6 +159,9 @@ function DashboardUser() {
                             <span>Grade :</span>
                             <span>{userProfile.grade_id}</span>
                         </p>
+                        <button onClick={handleEditProfile} className="mt-4 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded">
+                            Edit Profile
+                        </button>
                     </div>
                 ) :  showUsers && (
                     <div className="mt-5">
@@ -196,6 +231,16 @@ function DashboardUser() {
                         </div>
                     </div>
                 )}
+                <UpdateModal
+                    isOpen={isProfileModalOpen}
+                    onClose={() => setProfileModalOpen(false)}
+                    onSubmit={handleProfileUpdate}
+                    user={userProfile}
+                />
+                <ToastSuccessUpdate
+                    isVisible={isToastVisible}
+                    onClose={closeToast}
+                />
             </div>
         </div>
     );
