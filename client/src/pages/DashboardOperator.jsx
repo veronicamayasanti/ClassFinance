@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import { getAllUsers, updateUserApi, deleteUser, registerUser } from '../api';
+import { getAllUsers, updateUserApi, deleteUser, registerUser, getUserById } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
 import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
@@ -25,9 +25,11 @@ function DashboardOperator() {
 
     const [toastVisible, setToastVisible] = useState(false);
     const [toastVisibleDelete, setToastVisibleDelete] = useState(false);
+    const [userProfile, setUserProfile] = useState(null);
 
     const userName = localStorage.getItem('userName');
     const gradeId = localStorage.getItem('userGradeId')
+    const userId = localStorage.getItem('userId')
     const navigate = useNavigate()
 
     const handleLogout = () => {
@@ -38,12 +40,8 @@ function DashboardOperator() {
     };
 
     const fetchUsers = async (page, searchTerm) => {
-
-        console.log("Fetching users for page:", page, "searchTerm:", searchTerm, "Grade ID:", gradeId); // Log for debugging
-
         try {
             const result = await getAllUsers(page, limit, searchTerm,null,  gradeId );
-            console.log("API Response:", result); // Log the API response
             setUsers(result.users);
             setTotalPages(result.totalPages);
         } catch (err) {
@@ -52,9 +50,17 @@ function DashboardOperator() {
         }
     };
 
-    const handleShowUsers = () => {
-        fetchUsers(currentPage, searchTerm);
-        setShowUsers(true);
+    const handleShowUsers = async () => {
+        if (showUsers) {
+            // If already showing users, clear the user profile and set showUsers to false
+            setUserProfile(null);
+            setShowUsers(false);
+        } else {
+            // Show users
+            await fetchUsers(currentPage, searchTerm);
+            setShowUsers(true);
+            setUserProfile(null); // Clear profile when viewing users
+        }
     };
 
     useEffect(() => {
@@ -142,11 +148,26 @@ function DashboardOperator() {
         }
     };
 
+    const fetchProfile = async () => {
+        try {
+            const userData = await getUserById(userId);
+            setUserProfile((prevProfile) => (prevProfile ? null : userData)); // Toggle the profile visibility
+            setShowUsers(false);
+        } catch (err) {
+            setError("could not fetch profile data.")
+        }
+    }
+
     return (
         <div className="flex min-h-screen">
             <div className="w-1/4 bg-gray-800 text-white p-5">
                 <h2 className="text-2xl font-bold mb-4">Catatan Kas kelas {gradeId} SDN Cileles</h2>
                 <ul className="space-y-2">
+                    <li>
+                        <button onClick={fetchProfile} className="w-full text-left bg-green-600 hover:bg-green-500 px-4 py-2 rounded">
+                            My Profile
+                        </button>
+                    </li>
                     <li>
                         <button onClick={handleShowUsers} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
                             All Students Grade {gradeId}
@@ -162,7 +183,33 @@ function DashboardOperator() {
 
             <div className="flex-1 p-10 bg-gray-100">
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang korlas, {userName} !</h1>
-                {showUsers && (
+                {error && <p className="text-red-500">{error}</p>}
+
+                {userProfile ? (
+                        <div className="bg-white p-5 rounded shadow-md w-xs">
+                            <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+                            <table className="min-w-full bg-white">
+                                <tbody>
+                                <tr>
+                                    <td>Full Name :</td>
+                                    <td>{userProfile.name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Email Address :</td>
+                                    <td>{userProfile.email}</td>
+                                </tr>
+                                <tr>
+                                    <td>Phone Number :</td>
+                                    <td>{userProfile.phone_number}</td>
+                                </tr>
+                                <tr>
+                                    <td>Grade :</td>
+                                    <td>{userProfile.grade_id}</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    ) : showUsers && (
                     <div className="mt-5">
                         {error && <p className="text-red-500">{error}</p>}
                         <div>

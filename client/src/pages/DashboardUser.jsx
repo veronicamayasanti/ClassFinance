@@ -143,22 +143,26 @@ function DashboardUser() {
                 {userProfile ? (
                     <div className="bg-white p-5 rounded shadow-md w-xs">
                         <h2 className="text-2xl font-bold mb-4">User Profile</h2>
-                        <p className="flex justify-between">
-                            <span>Full Name :</span>
-                            <span>{userProfile.name}</span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>Email Address: </span>
-                            <span>{userProfile.email}</span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>Phone Number :</span>
-                            <span>{userProfile.phone_number}</span>
-                        </p>
-                        <p className="flex justify-between">
-                            <span>Grade :</span>
-                            <span>{userProfile.grade_id}</span>
-                        </p>
+                        <table className="min-w-full bg-white">
+                            <tbody>
+                            <tr>
+                                <td>Full Name :</td>
+                                <td>{userProfile.name}</td>
+                            </tr>
+                            <tr>
+                                <td>Email Address :</td>
+                                <td>{userProfile.email}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone Number :</td>
+                                <td>{userProfile.phone_number}</td>
+                            </tr>
+                            <tr>
+                                <td>Grade :</td>
+                                <td>{userProfile.grade_id}</td>
+                            </tr>
+                            </tbody>
+                        </table>
                         <button onClick={handleEditProfile} className="mt-4 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded">
                             Edit Profile
                         </button>
