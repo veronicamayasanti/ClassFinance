@@ -1,7 +1,5 @@
 import db from '../database.js'
 
-
-
 // register user
 export  const registerUserModel = (name, phone_number, email, password, role_id, grade_id) => {
     return new Promise((resolve, reject) => {
