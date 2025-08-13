@@ -1,4 +1,5 @@
 import db from "../database.js"
+import {reject} from "bcrypt/promises.js";
 
 // create budget
 export const createBudgetModel = (grade_id, cost, total, name) => {
@@ -13,3 +14,15 @@ export const createBudgetModel = (grade_id, cost, total, name) => {
     })
 }
 
+// get all budgets
+export const getAllBudgetsModel = () => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM tb_budgets';
+        db.query(sql, (error,result) => {
+            if(error){
+                return reject(error, error.message = "error in model");
+            }
+            resolve(result)
+        })
+    })
+}
