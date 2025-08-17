@@ -1,6 +1,7 @@
 import {
     createBudgetService,
-    getAllBudgetsService
+    getAllBudgetsService,
+    getBudgetByIdService
 } from "../services/budgetService.js";
 export const createBudgetController = async (req, res) => {
     try{
@@ -18,5 +19,16 @@ export const getAllBudgetsController = async (req, res) => {
         res.status(200).json(budgets)
     } catch (error) {
         res.status(500).json({message: "error in controller java", error} )
+    }
+}
+
+// get budget by id
+export const getBudgetByIdController = async (req, res) => {
+    const budgetId = req.params.id
+    try {
+        const budget = await getBudgetByIdService(budgetId);
+        res.json(budget)
+    }catch (error) {
+        res.status(404).json({error: error.message})
     }
 }

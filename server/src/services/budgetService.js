@@ -1,6 +1,7 @@
 import {
     createBudgetModel,
-    getAllBudgetsModel
+    getAllBudgetsModel,
+    getBudgetByIdModel
 } from "../models/budgetModel.js";
 
 // create budgets
@@ -12,4 +13,15 @@ export const createBudgetService = async (budgetData) => {
 // get all budgets service
 export const getAllBudgetsService = async () => {
     return await getAllBudgetsModel()
+}
+
+
+// get budget by id
+export const getBudgetByIdService = async (id) => {
+    try{
+        const budget = await getBudgetByIdModel(id);
+        return budget
+    }catch (error) {
+        throw new Error('Error in getBudgetByIdService: '+ error.message)
+    }
 }

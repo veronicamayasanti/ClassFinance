@@ -28,7 +28,7 @@ export const getAllBudgetsModel = () => {
 }
 
 // get budget by id
-export const getBudgetById = (id) => {
+export const getBudgetByIdModel = (id) => {
     return new Promise((resolve, reject) => {
         const sql = 'SELECT * FROM tb_budgets WHERE id = ? '
         db.query(sql, [id], (error, result) => {
@@ -42,3 +42,4 @@ export const getBudgetById = (id) => {
         })
     })
 }
+
