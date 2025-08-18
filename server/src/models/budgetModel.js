@@ -1,5 +1,4 @@
 import db from "../database.js"
-import {reject} from "bcrypt/promises.js";
 
 // create budget
 export const createBudgetModel = (grade_id, cost, total, name) => {
@@ -43,3 +42,15 @@ export const getBudgetByIdModel = (id) => {
     })
 }
 
+// update data budget
+export const updateBudgetModel = (id,grade_id, cost, total, name) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE tb_budgets SET grade_id = ?, cost = ?, total = ?, name = ? WHERE id = ?';
+        db.query(sql, [grade_id, cost, total, name, id], (error, result) => {
+            if (error) {
+                return reject(error, error.message = "error update in model")
+            }
+            resolve(result);
+        })
+    })
+}

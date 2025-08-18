@@ -70,7 +70,6 @@ export const getUsersByGradeService = async (gradeId) => {
     }
 }
 
-
 // Get total user count for pagination
 export const getTotalUserCount = async (searchTerm = '', roleId = null, gradeId = null) => {
     try {
@@ -112,7 +111,6 @@ export const getAllUserService = async (offset = 0, limit = 10, searchTerm = '',
         throw new Error('Error in getAllUserService: ' + error.message);
     }
 };
-
 
 // Update user
 export const updateUserService = async (id, name, phone_number, email, grade_id) => {
