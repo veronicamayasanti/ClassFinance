@@ -54,3 +54,16 @@ export const updateBudgetModel = (id,grade_id, cost, total, name) => {
         })
     })
 }
+
+// delete budget
+export const deleteBudgetModel = (id) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'DELETE FROM tb_budgets WHERE id = ?';
+        db.query(sql, [id], (error, result) => {
+            if (error){
+                return reject(error, error.message = "error in model")
+            }
+            resolve(result)
+        })
+    })
+}

@@ -2,7 +2,8 @@ import {
     createBudgetService,
     getAllBudgetsService,
     getBudgetByIdService,
-    updateBudgetService
+    updateBudgetService,
+    deleteBudgetService
 } from "../services/budgetService.js";
 export const createBudgetController = async (req, res) => {
     try{
@@ -43,5 +44,16 @@ export const updateBudgetController = async (req, res) => {
         res.json({ message: 'User updated successfully', budget: req.body })
     } catch (error) {
         res.status(500).json({error: "error in controller"})
+    }
+}
+
+// delete budget
+export const deleteBudgetController = async (req, res) => {
+    const budgetId = req.params.id
+    try{
+        await deleteBudgetService(budgetId);
+        res.json({message: 'budget deleted successfully'})
+    }catch (error) {
+        res.status(500).json({error : 'error in controller'})
     }
 }

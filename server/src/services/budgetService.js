@@ -2,7 +2,8 @@ import {
     createBudgetModel,
     getAllBudgetsModel,
     getBudgetByIdModel,
-    updateBudgetModel
+    updateBudgetModel,
+    deleteBudgetModel
 } from "../models/budgetModel.js";
 
 // create budgets
@@ -32,5 +33,14 @@ export const updateBudgetService = async (id, grade_id, cost, total, name) => {
         return await updateBudgetModel(id, grade_id, cost, total, name);
     }catch (error) {
         throw new Error('Error in updatebudgetservice: ' + error.message)
+    }
+}
+
+// delete budget
+export const deleteBudgetService = async (id) => {
+    try {
+        return await deleteBudgetModel(id);
+    }catch (error) {
+        throw new Error('error in service ' + error.message)
     }
 }
