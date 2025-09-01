@@ -1,6 +1,11 @@
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from "react-router-dom";
-import { getAllUsers, updateUserApi, deleteUser, registerUser, getUserById } from '../api';
+import { getAllUsers,
+    updateUserApi,
+    deleteUser,
+    registerUser,
+    getUserById,
+    getAllBudgetApi } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
 import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
@@ -14,6 +19,7 @@ function DashboardOperator() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [showUsers, setShowUsers] = useState(false);
+    const [showView, setShowView] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -26,6 +32,10 @@ function DashboardOperator() {
     const [toastVisible, setToastVisible] = useState(false);
     const [toastVisibleDelete, setToastVisibleDelete] = useState(false);
     const [userProfile, setUserProfile] = useState(null);
+
+    const [budgets, setBudgets] = useState([]);
+    const [budgetError, setBudgetError] = useState(null);
+    const [showBudgets, setShowBudgets] = useState(false);
 
     const userName = localStorage.getItem('userName');
     const gradeId = localStorage.getItem('userGradeId')
@@ -50,6 +60,36 @@ function DashboardOperator() {
         }
     };
 
+    const fetchBudgets = async () => {
+        try {
+            const result = await getAllBudgetApi(); // Fetch budgets
+            setBudgets(result); // Store fetched budgets
+            console.log(result)
+        } catch (err) {
+            console.error("Fetch error:", err);
+            setBudgetError(err.message); // Handle budget fetch error
+        }
+    };
+
+    useEffect(() => {
+        if (showView === 'users') {
+            fetchUsers(currentPage, searchTerm);
+        } else if (showView === 'budgets') {
+            fetchBudgets();
+        } else if (showView === 'profile') {
+            fetchProfile();
+        }
+    }, [currentPage, showView, limit, searchTerm]);
+
+    const handleShowView = (view) => {
+        if (showView === view) {
+            setShowView(''); // If the same button is clicked, hide
+        } else {
+            setShowView(view); // Change view
+            setCurrentPage(1); // Reset to first page
+        }
+    };
+
     const handleShowUsers = async () => {
         if (showUsers) {
             // If already showing users, clear the user profile and set showUsers to false
@@ -63,17 +103,23 @@ function DashboardOperator() {
         }
     };
 
-    useEffect(() => {
-        if (showUsers) {
-            fetchUsers(currentPage, searchTerm);
-        }
-    }, [currentPage, showUsers, searchTerm, limit]);
 
-    const handleSearchChange = (e) => {
+
+    const handleShowBudgets = async () => {
+        if (showBudgets) {
+            setShowBudgets(false); // Hide budgets
+        } else {
+            await fetchBudgets(1); // Fetch budgets for the first page
+            setShowBudgets(true); // Show budgets
+        }
+    };
+
+
+    const handleSearchChange = async  (e) => {
         const value = e.target.value;
         setSearchTerm(value);
         setCurrentPage(1); // Set currentPage ke 1 saat pencarian diubah
-        fetchUsers(1, value);
+        await fetchUsers(1, value);
     };
 
     const changePage = (page) => {
@@ -151,12 +197,12 @@ function DashboardOperator() {
     const fetchProfile = async () => {
         try {
             const userData = await getUserById(userId);
-            setUserProfile((prevProfile) => (prevProfile ? null : userData)); // Toggle the profile visibility
-            setShowUsers(false);
+            setUserProfile(userData); // Set profile data
+            setShowView('profile'); // Ensure profile view is set
         } catch (err) {
-            setError("could not fetch profile data.")
+            setError("could not fetch profile data.");
         }
-    }
+    };
 
     return (
         <div className="flex min-h-screen">
@@ -164,15 +210,22 @@ function DashboardOperator() {
                 <h2 className="text-2xl font-bold mb-4">Catatan Kas kelas {gradeId} SDN Cileles</h2>
                 <ul className="space-y-2">
                     <li>
-                        <button onClick={fetchProfile} className="w-full text-left bg-green-600 hover:bg-green-500 px-4 py-2 rounded">
+                        <button onClick={() => handleShowView('profile')} className="w-full text-left bg-green-600 hover:bg-green-500 px-4 py-2 rounded">
                             My Profile
                         </button>
                     </li>
                     <li>
-                        <button onClick={handleShowUsers} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
+                        <button onClick={() => handleShowView('users')} className="w-full text-left bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded">
                             All Students Grade {gradeId}
                         </button>
                     </li>
+
+                    <li>
+                        <button onClick={() => handleShowView('budgets')} className="w-full text-left bg-purple-600 hover:bg-purple-500 px-4 py-2 rounded">
+                            All Budgets
+                        </button>
+                    </li>
+
                     <li>
                         <button onClick={handleLogout} className="w-full text-left bg-red-600 hover:bg-red-500 px-4 py-2 rounded">
                             Logout
@@ -185,131 +238,159 @@ function DashboardOperator() {
                 <h1 className="text-3xl font-semibold mb-4">Selamat datang korlas, {userName} !</h1>
                 {error && <p className="text-red-500">{error}</p>}
 
-                {userProfile ? (
-                        <div className="bg-white p-5 rounded shadow-md w-xs">
-                            <h2 className="text-2xl font-bold mb-4">User Profile</h2>
-                            <table className="min-w-full bg-white">
-                                <tbody>
-                                <tr>
-                                    <td>Full Name :</td>
-                                    <td>{userProfile.name}</td>
-                                </tr>
-                                <tr>
-                                    <td>Email Address :</td>
-                                    <td>{userProfile.email}</td>
-                                </tr>
-                                <tr>
-                                    <td>Phone Number :</td>
-                                    <td>{userProfile.phone_number}</td>
-                                </tr>
-                                <tr>
-                                    <td>Grade :</td>
-                                    <td>{userProfile.grade_id}</td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : showUsers && (
+                {showView === 'profile' && userProfile && (
+                    <div className="bg-white p-5 rounded shadow-md w-xs">
+                        <h2 className="text-2xl font-bold mb-4">User Profile</h2>
+                        <table className="min-w-full bg-white">
+                            <tbody>
+                            <tr>
+                                <td>Full Name :</td>
+                                <td>{userProfile.name}</td>
+                            </tr>
+                            <tr>
+                                <td>Email Address :</td>
+                                <td>{userProfile.email}</td>
+                            </tr>
+                            <tr>
+                                <td>Phone Number :</td>
+                                <td>{userProfile.phone_number}</td>
+                            </tr>
+                            <tr>
+                                <td>Grade :</td>
+                                <td>{userProfile.grade_id}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {showView === 'users' && (
                     <div className="mt-5">
-                        {error && <p className="text-red-500">{error}</p>}
-                        <div>
-                            <h4 className="text-3xl font-semibold mb-4"> Daftar Siswa Kelas {gradeId} </h4>
-                            <div className="mb-5 flex items-center space-x-4">
-                                <input
-                                    type="text"
-                                    placeholder="Search by name"
-                                    value={searchTerm}
-                                    onChange={handleSearchChange}
-                                    className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm border-2"
-                                />
-
-                                <label className="block text-sm font-medium text-gray-900 mb-1">entries per page:</label>
-                                <select
-                                    value={limit}
-                                    onChange={(e) => {
-                                        setLimit(Number(e.target.value));
-                                        setCurrentPage(1);
-                                        fetchUsers(1, searchTerm);
-                                    }}
-                                    className="rounded-md bg-white px-2 py-1 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm border-2"
-                                >
-                                    <option value={2}>2</option>
-                                    <option value={5}>5</option>
-                                    <option value={10}>10</option>
-                                    <option value={15}>15</option>
-                                </select>
-
-
-                                <button onClick={() => setIsAddUserModalOpen(true)}
-                                        id="createProductModalButton"
-                                        data-modal-target="createProductModal"
-                                        data-modal-toggle="createProductModal"
-                                        className="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
-                                    <svg
-                                        className="h-3.5 w-3.5 mr-2"
-                                        fill="currentColor"
-                                        viewBox="0 0 20 20"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        aria-hidden="true">
-                                        <path
-
-                                            d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
-                                    </svg>
-                                    Add User
-                                </button>
-                                </div>
-
-
-                            <table className="min-w-full border border-gray-300">
-                                <thead>
-                                <tr>
-                                    <th className="border-b p-2 text-left">Nama</th>
-                                    <th className="border-b p-2 text-left">Nomor Telepon</th>
-                                    <th className="border-b p-2 text-left">Email</th>
-                                    <th className="border-b p-2 text-left">Grade ID</th>
-                                    <th className="border-b p-2 text-left">Aksi</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {users.length > 0 ? (
-                                    users.map((user) => (
-                                        <tr key={user.id}>
-                                            <td className="border-b p-2">{user.name}</td>
-                                            <td className="border-b p-2">{user.phone_number}</td>
-                                            <td className="border-b p-2">{user.email}</td>
-                                            <td className="border-b p-2">{user.grade_id}</td>
-                                            <td className="border-b p-2">
-                                                <button
-                                                    onClick={() => handleUpdateUser(user)}
-                                                    className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
-                                                >
-                                                    Update
-                                                </button>
-                                                <button
-                                                    onClick={() => confirmDeleteUser(user.id)} // Tombol untuk delete
-                                                    className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 ml-2 rounded"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan="4" className="border-b p-2 text-center">Tidak ada pengguna yang
-                                            ditemukan.
+                        <h4 className="text-3xl font-semibold mb-4"> Daftar Siswa Kelas {gradeId} </h4>
+                        <div className="mb-5 flex items-center space-x-4">
+                            <input
+                                type="text"
+                                placeholder="Search by name"
+                                value={searchTerm}
+                                onChange={(e) => {
+                                    setSearchTerm(e.target.value);
+                                    setCurrentPage(1);
+                                }}
+                                className="flex-1 max-w-xs rounded-md bg-white px-2 py-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-2 focus:outline-indigo-600 sm:text-sm border-2"
+                            />
+                            <label className="block text-sm font-medium text-gray-900 mb-1">entries per page:</label>
+                            <select
+                                value={limit}
+                                onChange={(e) => {
+                                    setLimit(Number(e.target.value));
+                                    setCurrentPage(1);
+                                    fetchUsers(1, searchTerm);
+                                }}
+                                className="rounded-md bg-white px-2 py-1 text-base text-gray-900 sm:text-sm border-2"
+                            >
+                                <option value={2}>2</option>
+                                <option value={5}>5</option>
+                                <option value={10}>10</option>
+                                <option value={15}>15</option>
+                            </select>
+                            <button onClick={() => setIsAddUserModalOpen(true)} className="flex items-center justify-center text-white bg-blue-600 hover:bg-blue-500 rounded-lg px-4 py-2">
+                                Add User
+                            </button>
+                        </div>
+                        <table className="min-w-full border border-gray-300">
+                            <thead>
+                            <tr>
+                                <th className="border-b p-2 text-left">Nama</th>
+                                <th className="border-b p-2 text-left">Nomor Telepon</th>
+                                <th className="border-b p-2 text-left">Email</th>
+                                <th className="border-b p-2 text-left">Grade ID</th>
+                                <th className="border-b p-2 text-left">Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {users.length > 0 ? (
+                                users.map((user) => (
+                                    <tr key={user.id}>
+                                        <td className="border-b p-2">{user.name}</td>
+                                        <td className="border-b p-2">{user.phone_number}</td>
+                                        <td className="border-b p-2">{user.email}</td>
+                                        <td className="border-b p-2">{user.grade_id}</td>
+                                        <td className="border-b p-2">
+                                            <button
+                                                onClick={() => handleUpdateUser(user)}
+                                                className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
+                                            >
+                                                Update
+                                            </button>
+                                            <button
+                                                onClick={() => confirmDeleteUser(user.id)}
+                                                className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 ml-2 rounded"
+                                            >
+                                                Delete
+                                            </button>
                                         </td>
                                     </tr>
-                                )}
-                                </tbody>
-                            </table>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="border-b p-2 text-center">Tidak ada pengguna yang ditemukan.</td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                        <Pagination
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            onPageChange={(page) => setCurrentPage(page)}
+                        />
+                    </div>
+                )}
 
-                            <Pagination
-                                currentPage={currentPage}
-                                totalPages={totalPages}
-                                onPageChange={changePage}
-                            />
-                        </div>
+                {showView === 'budgets' && (
+                    <div className="mt-5">
+                        {budgetError && <p className="text-red-500">{budgetError}</p>}
+                        <h4 className="text-3xl font-semibold mb-4">Daftar Anggaran</h4>
+                        <table className="min-w-full border border-gray-300">
+                            <thead>
+                            <tr>
+                                <th className="border-b p-2 text-left">Budget ID</th>
+                                <th className="border-b p-2 text-left">Name</th>
+                                <th className="border-b p-2 text-left">Cost</th>
+                                <th className="border-b p-2 text-left">Total</th>
+                                <th className="border-b p-2 text-left">Aksi</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {budgets.length > 0 ? (
+                                budgets.map((budget) => (
+                                    <tr key={budget.id}>
+                                        <td className="border-b p-2">{budget.id}</td>
+                                        <td className="border-b p-2">{budget.name}</td>
+                                        <td className="border-b p-2">{budget.cost}</td>
+                                        <td className="border-b p-2">{budget.total}</td>
+                                        <td className="border-b p-2">
+                                            <button
+                                                onClick={() => handleUpdateUser(user)} // Adjust this if you have a different update logic for budgets
+                                                className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
+                                            >
+                                                Update
+                                            </button>
+                                            <button
+                                                // Set your delete logic if it exists
+                                                className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 ml-2 rounded"
+                                            >
+                                                Delete
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan="5" className="border-b p-2 text-center">Tidak ada anggaran yang ditemukan.</td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>

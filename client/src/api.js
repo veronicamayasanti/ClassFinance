@@ -1,8 +1,8 @@
-const API_BASE_URL = 'http://localhost:3000/api/user'
+const API_BASE_URL = 'http://localhost:3000/api'
 
 // register user
 export const registerUser = async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/register`, {
+    const response = await fetch(`${API_BASE_URL}/user/register`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -13,7 +13,7 @@ export const registerUser = async (userData) => {
 }
 
 export const loginUser = async (userData) => {
-    const response = await fetch(`${API_BASE_URL}/login`, {
+    const response = await fetch(`${API_BASE_URL}/user/login`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export const loginUser = async (userData) => {
 
 // Get all users
 export const getAllUsers = async (page, limit, searchTerm = '', roleId = null, gradeId = null) => {
-    let url = `${API_BASE_URL}?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}&roleId=${roleId}&gradeId=${gradeId}`;
+    let url = `${API_BASE_URL}/user?page=${page}&limit=${limit}&search=${encodeURIComponent(searchTerm)}&roleId=${roleId}&gradeId=${gradeId}`;
 
     if (roleId) {
         url += `&roleId=${roleId}`;
@@ -48,7 +48,7 @@ export const getAllUsers = async (page, limit, searchTerm = '', roleId = null, g
 };
 // Update user
 export const updateUserApi = async (id, userData) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/user/${id}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const updateUserApi = async (id, userData) => {
 
 // Delete user
 export const deleteUser = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/user/${id}`, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -69,8 +69,9 @@ export const deleteUser = async (id) => {
     return response.json(); // Mengembalikan respons dari server
 };
 
+// get by id user
 export const getUserById = async (id) => {
-    const response = await fetch(`${API_BASE_URL}/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/user/${id}`, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
@@ -79,6 +80,21 @@ export const getUserById = async (id) => {
 
     if (!response.ok) {
         throw new Error('Failed to fetch user by ID');
+    }
+    return response.json();
+};
+
+// get all budget
+export const getAllBudgetApi = async () => {
+    const response = await fetch(`${API_BASE_URL}/budget`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch budgets');
     }
     return response.json();
 };
