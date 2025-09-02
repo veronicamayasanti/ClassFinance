@@ -5,13 +5,16 @@ import { getAllUsers,
     deleteUser,
     registerUser,
     getUserById,
-    getAllBudgetApi } from '../api';
+    getAllBudgetApi,
+    updateBudgetApi } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
+import updateModalBudget from "./UpdateModalBudget.jsx";
 import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
 import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
 import ToastSuccessDelete from "./ToastSuccessDelete.jsx";
 import Pagination from "./Pagination.jsx";
+import UpdateModalBudget from "./UpdateModalBudget.jsx";
 
 function DashboardOperator() {
     const [users, setUsers] = useState([]);
@@ -23,8 +26,10 @@ function DashboardOperator() {
     const [searchTerm, setSearchTerm] = useState('');
     const [limit, setLimit] = useState(2);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedBudget, setSelectedBudget] = useState(null)
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isModalUpdateBudgetOpen, setIsModalUpdateBudgetOpen] = useState(false);
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
@@ -96,7 +101,7 @@ function DashboardOperator() {
             setUserProfile(null);
             setShowUsers(false);
         } else {
-            // Show users
+            // Show  vvvv
             await fetchUsers(currentPage, searchTerm);
             setShowUsers(true);
             setUserProfile(null); // Clear profile when viewing users
@@ -133,9 +138,19 @@ function DashboardOperator() {
         setIsModalOpen(true);
     };
 
+    const handleUpdateBudget = async (budget) => {
+        setSelectedBudget(budget);
+        setIsModalUpdateBudgetOpen(true);
+    };
+
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedUser(null);
+    };
+
+    const closeModalUpdateBudget = () => {
+        setIsModalUpdateBudgetOpen(false);
+        setSelectedBudget(null);
     };
 
     const handleShowToast = () => {
@@ -156,6 +171,17 @@ function DashboardOperator() {
             }, 3000);
         } catch (error) {
             setError('Error updating user: ' + error.message);
+        }
+    };
+
+    const updateBudget = async (budgetId, budgetData) => {
+        try {
+            await updateBudgetApi(budgetId, budgetData);
+            fetchBudgets(currentPage, searchTerm);
+            closeModalUpdateBudget();
+        } catch (error) {
+            setError('Error updating user: ' + error.message);
+            console.log('error update budget ' +error.message)
         }
     };
 
@@ -370,7 +396,7 @@ function DashboardOperator() {
                                         <td className="border-b p-2">{budget.total}</td>
                                         <td className="border-b p-2">
                                             <button
-                                                onClick={() => handleUpdateUser(user)} // Adjust this if you have a different update logic for budgets
+                                                onClick={() => handleUpdateBudget(budget)} // Adjust this if you have a different update logic for budgets
                                                 className="bg-yellow-500 hover:bg-yellow-400 text-white px-2 py-1 rounded"
                                             >
                                                 Update
@@ -402,6 +428,18 @@ function DashboardOperator() {
                     onClose={closeModal}
                     onSubmit={async (userData) => {
                         await updateUser(selectedUser.id, userData);
+                    }}
+                />
+            )}
+
+            {isModalUpdateBudgetOpen && (
+                <UpdateModalBudget
+                    isOpen={isModalUpdateBudgetOpen}
+                    budget={selectedBudget}
+                    onClose={closeModalUpdateBudget}
+                    onSubmit={async (budgetData) => {
+                        await updateBudget(selectedBudget.id, budgetData);
+                        console.log(budgetData)
                     }}
                 />
             )}

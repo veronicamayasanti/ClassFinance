@@ -98,3 +98,15 @@ export const getAllBudgetApi = async () => {
     }
     return response.json();
 };
+
+// Update budget
+export const updateBudgetApi = async (id, budgetData) => {
+    const response = await fetch(`${API_BASE_URL}/budget/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(budgetData),
+    });
+    return response.json();
+};
