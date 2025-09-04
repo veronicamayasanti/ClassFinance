@@ -6,9 +6,9 @@ import { getAllUsers,
     registerUser,
     getUserById,
     getAllBudgetApi,
-    updateBudgetApi } from '../api';
+    updateBudgetApi,
+    deleteBudgetApi } from '../api';
 import UpdateModal from "./UpdateModal.jsx";
-import updateModalBudget from "./UpdateModalBudget.jsx";
 import DeleteModal from "./DeleteModal.jsx";
 import AddUserModal from "./AddUserModal.jsx";
 import ToastSuccessUpdate from "./ToastSuccessUpdate.jsx";
@@ -33,6 +33,7 @@ function DashboardOperator() {
     const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
+    const [budgetToDelete, setBudgetToDelete] = useState(null);
 
     const [toastVisible, setToastVisible] = useState(false);
     const [toastVisibleDelete, setToastVisibleDelete] = useState(false);
@@ -179,6 +180,10 @@ function DashboardOperator() {
             await updateBudgetApi(budgetId, budgetData);
             fetchBudgets(currentPage, searchTerm);
             closeModalUpdateBudget();
+            handleShowToast()
+            setTimeout(() => {
+                setToastVisible(false); // Hide toast after 3 seconds
+            }, 3000);
         } catch (error) {
             setError('Error updating user: ' + error.message);
             console.log('error update budget ' +error.message)
@@ -195,18 +200,6 @@ function DashboardOperator() {
         }
     };
 
-    const handleShowToastDelete = () => {
-        setToastVisibleDelete(true);
-        setTimeout(() => {
-            setToastVisibleDelete(false); // Hide toast after 3 seconds
-        }, 3000);
-    };
-
-    const confirmDeleteUser = (id) => {
-        setUserToDelete(id); // Store user ID to delete
-        setIsDeleteModalOpen(true); // Open delete modal
-    };
-
     const handleDeleteUser = async () => {
         if (userToDelete) {
             try {
@@ -219,6 +212,34 @@ function DashboardOperator() {
             }
         }
     };
+
+    const handleDeleteBudget = async () => {
+        if (budgetToDelete) {
+            try {
+                await deleteBudgetApi(budgetToDelete); // Delete user by ID
+                fetchUsers(currentPage, searchTerm); // Refresh data after delete
+                setIsDeleteModalOpen(false); // Close modal
+                handleShowToastDelete()
+            } catch (error) {
+                setError('Error deleting user: ' + error.message);
+            }
+        }
+    };
+
+    const handleShowToastDelete = () => {
+        setToastVisibleDelete(true);
+        setTimeout(() => {
+            setToastVisibleDelete(false); // Hide toast after 3 seconds
+        }, 3000);
+    };
+
+    const confirmDeleteUser = (id) => {
+        setUserToDelete(id); // Store user ID to delete
+        setBudgetToDelete(id)
+        setIsDeleteModalOpen(true); // Open delete modal
+    };
+
+
 
     const fetchProfile = async () => {
         try {
@@ -403,6 +424,8 @@ function DashboardOperator() {
                                             </button>
                                             <button
                                                 // Set your delete logic if it exists
+
+                                                onClick={() => confirmDeleteUser(budget.id)}
                                                 className="bg-red-600 hover:bg-red-500 text-white px-2 py-1 ml-2 rounded"
                                             >
                                                 Delete
@@ -439,7 +462,6 @@ function DashboardOperator() {
                     onClose={closeModalUpdateBudget}
                     onSubmit={async (budgetData) => {
                         await updateBudget(selectedBudget.id, budgetData);
-                        console.log(budgetData)
                     }}
                 />
             )}
@@ -462,6 +484,14 @@ function DashboardOperator() {
                 />
             )}
 
+            {isDeleteModalOpen && ( // Add Delete Modal integration
+                <DeleteModal
+                    isOpen={isDeleteModalOpen}
+                    onClose={() => setIsDeleteModalOpen(false)} // Close the modal
+                    onDelete={handleDeleteBudget}
+                />
+            )}
+
             <ToastSuccessUpdate
                 isVisible={toastVisible}
                 onClose={() => setToastVisible(false)}
@@ -469,7 +499,7 @@ function DashboardOperator() {
 
             <ToastSuccessDelete
                 isVisible={toastVisibleDelete}
-                onClose={() => setToastVisible(false)}
+                onClose={() => setToastVisibleDelete(false)}
             />
 
         </div>

@@ -66,7 +66,7 @@ export const deleteUser = async (id) => {
             'Content-Type': 'application/json',
         },
     });
-    return response.json(); // Mengembalikan respons dari server
+    return response.json();
 };
 
 // get by id user
@@ -107,6 +107,17 @@ export const updateBudgetApi = async (id, budgetData) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(budgetData),
+    });
+    return response.json();
+};
+
+// Delete budget
+export const deleteBudgetApi = async (id) => {
+    const response = await fetch(`${API_BASE_URL}/budget/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
     });
     return response.json();
 };

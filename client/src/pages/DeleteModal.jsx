@@ -46,7 +46,7 @@ function DeleteModal({ isOpen, onClose, onDelete }) {
                             clipRule="evenodd"
                         />
                     </svg>
-                    <p className="mb-4 text-black">Are you sure you want to delete this user?</p>
+                    <p className="mb-4 text-black">Are you sure you want to delete this data?</p>
                     <div className="flex justify-center items-center space-x-4">
                         <button
                             type="button"

@@ -23,7 +23,7 @@ const UpdateModalBudget = ({ isOpen, onClose, onSubmit, budget }) => {
         <div className={`fixed inset-0 z-50 flex items-center justify-center`} style={{ backdropFilter: 'blur(3px)' }}>
         <div className="relative p-6 w-full max-w-2xl bg-gray-300 rounded-lg shadow-lg">
                 <div className="flex justify-between items-center pb-4 mb-4 border-b">
-                <h3 className="text-lg font-semibold text-gray-900">Update User</h3>
+                <h3 className="text-lg font-semibold text-gray-900">Update Budget</h3>
                         <button
                             type="button"
                             className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
